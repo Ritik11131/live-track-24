@@ -1,0 +1,134 @@
+<div class="card mt-3">
+  <p-table
+    #dt
+    [value]="users"
+    [paginator]="true"
+    [rows]="10"
+    [showCurrentPageReport]="true"
+    responsiveLayout="scroll"
+    [scrollable]="true"
+    scrollHeight="65vh"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [globalFilterFields]="['userName', 'loginId', 'email', 'mobileNo']"
+  >
+    <ng-template pTemplate="caption">
+      <div
+        class="flex flex-wrap gap-2 align-items-center justify-content-between"
+      >
+        <span>
+          <span
+            class="p-input-icon-left ml-2 w-full sm:w-20rem flex-order-1 sm:flex-order-0"
+          >
+            <i class="pi pi-search"></i>
+            <input
+              pInputText
+              type="text"
+              (input)="onGlobalFilter(dt, $event)"
+              placeholder="Search"
+              class="w-full"
+            />
+          </span>
+        </span>
+
+        <button
+          (click)="navigateToCreateUser()"
+          pButton
+          class="p-button-outlined w-full sm:w-auto flex-order-0 sm:flex-order-1"
+          icon="pi pi-user-plus"
+          label="Add New User"
+        ></button>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="userName" class="white-space-nowrap">
+          User Name
+          <p-sortIcon field="userName"></p-sortIcon>
+        </th>
+        <th pSortableColumn="loginId" class="white-space-nowrap">
+          Login Id
+          <p-sortIcon field="loginId"></p-sortIcon>
+        </th>
+        <th pSortableColumn="email" class="white-space-nowrap">
+          Email
+          <p-sortIcon field="email"></p-sortIcon>
+        </th>
+        <th pSortableColumn="mobileNo" class="white-space-nowrap">
+          Mobile No
+          <p-sortIcon field="mobileNo"></p-sortIcon>
+        </th>
+        <th pSortableColumn="userType" class="white-space-nowrap">
+          User Type
+          <p-sortIcon field="userType"></p-sortIcon>
+        </th>
+        <th pFrozenColumn [frozen]="true" alignFrozen="right">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-rowUser let-expanded="expanded">
+      <tr>
+        <ng-container *ngIf="userData; else userinfo">
+          <!-- Skeleton loading UI -->
+          <td><p-skeleton></p-skeleton></td>
+          <td><p-skeleton></p-skeleton></td>
+          <td><p-skeleton></p-skeleton></td>
+          <td><p-skeleton></p-skeleton></td>
+          <td><p-skeleton></p-skeleton></td>
+          <td><p-skeleton></p-skeleton></td>
+        </ng-container>
+        <ng-template #userinfo>
+          <!-- Actual data -->
+          <td>{{ rowUser.userName }}</td>
+          <td>{{ rowUser.loginId }}</td>
+          <td>{{ rowUser.email }}</td>
+          <td>{{ rowUser.mobileNo }}</td>
+          <td>{{ userService.getUserTypeLabel(rowUser.userType) }}</td>
+          <td
+            style="min-width: 225px"
+            pFrozenColumn
+            [frozen]="true"
+            alignFrozen="right"
+          >
+            <button
+              pButton
+              pRipple
+              pTooltip="View devices"
+              tooltipPosition="bottom"
+              type="button"
+              class="p-button-rounded p-button-text"
+              (click)="test()"
+            >
+              <i class="pi pi-car" style="font-size: 1.5rem"></i>
+            </button>
+            <button
+              pButton
+              pRipple
+              pTooltip="Linked Device"
+              tooltipPosition="bottom"
+              type="button"
+              class="p-button-rounded p-button-text"
+              (click)="linkedUsers(rowUser.id)"
+            >
+              <i class="pi pi-users" style="font-size: 1.5rem"></i>
+            </button>
+            <button
+              pButton
+              pRipple
+              pTooltip="Edit user"
+              tooltipPosition="bottom"
+              type="button"
+              class="p-button-rounded p-button-text"
+              style="font-size: 1.5rem"
+              (click)="navigateToUpdateUser(rowUser)"
+            >
+              <i class="pi pi-user-edit" style="font-size: 1.5rem"></i>
+            </button>
+          </td>
+        </ng-template>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>

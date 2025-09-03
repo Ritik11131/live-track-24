@@ -1,0 +1,18 @@
+export interface TripReport {
+    tripStartTime: string,
+    tripEndTime: string,
+    startLat: number,
+    startLng: number,
+    startAddress: string | null,
+    endLat: number,
+    endLng: number,
+    endAddress: string | null,
+    fkDeviceId: number,
+    avgSpeed: number,
+    distance: number,
+    id: number,
+    maxSpeed: number,
+    startLocation?:string,
+    endLocation?:string,
+    duration?:string,
+}

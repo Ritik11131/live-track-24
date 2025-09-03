@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Live Stream Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: black;
+        }
+
+        #player {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: black;
+        }
+
+        .info-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .view-selector {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+    <script type="text/javascript" src="../../../assets/camera/CvNet.js"></script>
+    <script type="text/javascript" src="../../../assets/camera/LiveStreamPlayer.js"></script>
+</head>
+<body>
+<div id="player"></div>
+
+<script>
+    // Initialize player
+    let player;
+
+    window.onload = function() {
+        const playerElement = document.getElementById('player');
+        const params = new URLSearchParams(window.location.search);
+        const simNumber = params.get('sim') || '';
+
+        // Initialize player
+        player = new LiveStreamPlayer(playerElement, {
+            simNumber: simNumber,
+            onStateChange: (state) => {
+                console.log('State changed:', state);
+                if (window.Android) {
+                    window.Android.onStateChange(JSON.stringify(state));
+                }
+            },
+            onError: (error) => {
+                console.error('Player error:', error);
+                if (window.Android) {
+                    window.Android.onError(error);
+                }
+            },
+            onVideoList: (videos) => {
+                console.log('Video list:', videos);
+                if (window.Android) {
+                    window.Android.onVideoList(JSON.stringify(videos));
+                }
+            }
+        });
+
+        // Make player globally accessible
+        window.player = player;
+    };
+
+    // Handle Android calls
+    window.togglePlay = function() {
+        if (player) {
+            player.togglePlay();
+        }
+    };
+
+    window.changeView = function(channel) {
+        if (player) {
+            player.changeChannel(channel);
+        }
+    };
+
+    window.startIntercom = function() {
+        if (player) {
+            return player.startIntercom();
+        }
+        return false;
+    };
+
+    window.stopIntercom = function() {
+        if (player) {
+            player.stopIntercom();
+        }
+    };
+
+    window.cleanup = function() {
+        if (player) {
+            player.stopVideo();
+            player = null;
+        }
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<div *ngIf="layout===2"
+     class="surface-ground h-screen w-screen flex align-items-center justify-content-center"
+     [ngClass]="{ 'p-input-filled': filledInput }"
+>
+    <div class="w-11 sm:w-5 md:w-4 lg:w-3"  >
+        <form  [formGroup]="loginForm" (ngSubmit)="login()" >
+            <div class="flex flex row w-full bg-white border-round-xl w-full">
+                <div
+                        class="py-7 px-5 sm:px-7 flex flex-column  w-full"
+                        style="border-radius: 14px"
+                >
+                    <img [src]="logo" />
+                    <h1 class="font-bold text-2xl mt-0 mb-2">{{ companyName }}</h1>
+                    <p class="text-color-secondary mb-4">
+                        Welcome to the <strong>{{ companyName }}</strong
+                    >, where the magic happens, sign in to continue.
+                    </p>
+
+                    <span class="p-input-icon-left mb-2">
+          <i class="pi pi-user"></i>
+          <input
+                  type="text"
+                  formControlName="loginId"
+                  pInputText
+                  placeholder="username"
+                  class="w-full text-xl"
+          />
+
+        </span>
+                    <small class="text-red-500 text-sm" *ngIf="isSubmitted && loginForm.get('loginId')?.invalid">LoginId is required</small>
+
+                    <span class="p-input-icon-left p-input-icon-right mb-2">
+          <i class="pi pi-key"></i>
+
+          <input
+                  type="{{ showPassword ? 'text' : 'password' }}"
+                  pInputText
+                  formControlName="password"
+                  placeholder="Password"
+                  class="w-full text-xl"
+          />
+
+          <i
+
+                  class="pi"
+                  [class]="showPassword ? 'pi-eye' : 'pi-eye-slash'"
+                  (click)="togglePasswordVisibility()"
+          ></i>
+
+        </span>
+                    <small class="text-red-500 text-sm" *ngIf="isSubmitted && loginForm.get('password')?.invalid">Password is required</small>
+
+                    <div class="flex justify-content-end mb-4">
+                        <p  class="text-sm cursor-pointer">
+                            Forgot Password
+                        </p>
+                    </div>
+                    <button
+                            pButton
+                            pRipple
+                            type="submit"
+                            label="Sign In"
+                            class="mb-4"
+                    ></button>
+                </div>
+
+            </div>
+        </form>
+    </div></div>
+
+<p-toast></p-toast>
+
+
+
+
+<div class="container" *ngIf="layout===1">
+    <div class="login flex flex-row">
+        <div
+                class=" logo flex w-7 justify-content-end align-items-start mt-4"
+        >
+            <div
+                    class="flex flex-column w-9 justify-content-center align-items-center "
+            >
+                <h2 class="font-bold m-1">WELCOME</h2>
+                <img style="height: 20rem; width: 25rem" src={{logo}} />
+            </div>
+        </div>
+        <div class=" form flex justify-content-center align-items-center w-5">
+            <form class="w-9" [formGroup]="loginForm" (ngSubmit)="login()">
+                <div class="flex w-full flex-column">
+                    <h2 class="flex align-self-center font-bold">LOGIN</h2>
+                    <div class="flex flex-column" style="border-radius: 14px">
+            <span class="p-input-icon-left mb-2">
+              <i class="pi pi-user"></i>
+              <input
+                      type="text"
+                      formControlName="loginId"
+                      pInputText
+                      placeholder="username"
+                      class="w-full text-xl"
+              />
+            </span>
+                        <small
+                                class="text-red-500 text-sm"
+                                *ngIf="isSubmitted && loginForm.get('loginId')?.invalid"
+                        >LoginId is required</small
+                        >
+
+                        <span class="p-input-icon-left p-input-icon-right mb-2">
+              <i class="pi pi-key"></i>
+
+              <input
+                      type="{{ showPassword ? 'text' : 'password' }}"
+                      pInputText
+                      formControlName="password"
+                      placeholder="Password"
+                      class="w-full text-xl"
+              />
+
+              <i
+                      class="pi"
+                      [class]="showPassword ? 'pi-eye' : 'pi-eye-slash'"
+                      (click)="togglePasswordVisibility()"
+              ></i>
+            </span>
+                        <small
+                                class="text-red-500 text-sm"
+                                *ngIf="isSubmitted && loginForm.get('password')?.invalid"
+                        >Password is required</small
+                        >
+
+                        <div class="flex justify-content-end mb-4">
+                            <p class="text-sm cursor-pointer">Forgot Password</p>
+                        </div>
+                        <button
+                                pButton
+                                pRipple
+                                type="submit"
+                                label="Sign In"
+                                class="mb-4 text-xl"
+                        ></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

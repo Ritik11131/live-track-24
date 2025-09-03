@@ -1,0 +1,47 @@
+
+ export enum IconType {
+    POWER = 1,
+    AC = 2,
+    TEMPERATURE = 3,
+    DOOR = 4,
+    BATTERY = 5,
+    ENGINE = 6,
+    GPS = 7,
+    SPEED = 8,
+    DISTANCE = 9,
+    BATTERYPER = 10,
+    IMMOBILIZER=11,
+    SOC=12,
+    WHEELLOCK=13,
+    ODOMETER=14
+  }
+  
+  export const icons = {
+    engine_on: "assets/demo/images/vehicle-detail/engine_active.svg",
+    engine_off: "assets/demo/images/vehicle-detail/engine_inactive.svg",
+    temperature_on: "assets/demo/images/vehicle-detail/temp_active.svg",
+    temperature_off: "assets/demo/images/vehicle-detail/temp_inactive.svg",
+    temperature_null: "assets/demo/images/vehicle-detail/temp_null.svg",
+    door_on: "assets/demo/images/vehicle-detail/door_active.svg",
+    door_off: "assets/demo/images/vehicle-detail/door_inactive.svg",
+    door_null: "assets/demo/images/vehicle-detail/door_null.svg",
+    ac_on: "assets/demo/images/vehicle-detail/ac_active.svg",
+    ac_off: "assets/demo/images/vehicle-detail/ac_inactive.svg",
+    ac_null: "assets/demo/images/vehicle-detail/ac_null.svg",
+    power_on: "assets/demo/images/vehicle-detail/power_active.svg",
+    power_off: "assets/demo/images/vehicle-detail/power_inactive.svg",
+    gps_on: "assets/demo/images/vehicle-detail/gps_active.svg",
+    gps_off: "assets/demo/images/vehicle-detail/gps_inactive.svg",
+    speed: "assets/demo/images/vehicle-detail/speed.svg",
+    distance: "assets/demo/images/vehicle-detail/distance.svg",
+    battery: "assets/demo/images/vehicle-detail/battery_high.svg",
+    batteryPer_high: "assets/demo/images/vehicle-detail/batteryPer_high.svg",
+    batteryPer_low: "assets/demo/images/vehicle-detail/batteryPer_high.svg",
+    immobilizer_off: "assets/demo/images/vehicle-detail/immobilizer_off.svg",
+    immobilizer_on: "assets/demo/images/vehicle-detail/immobolizer_on.svg",
+    soc_low:"assets/demo/images/vehicle-detail/soc_low.png",
+    soc_high:"assets/demo/images/vehicle-detail/soc_high.png",
+    wheelLock_on:"assets/demo/images/vehicle-detail/wheel_lock_on.png",
+    wheelLock_off:"assets/demo/images/vehicle-detail/wheel_lock_off.png",
+    odometer:"assets/demo/images/vehicle-detail/odometer.svg"
+  };

@@ -1,0 +1,394 @@
+<div class="grid">
+
+    <!-- Chart js-->
+    <div *ngIf="layout===1" class="col-12 lg:col-4">
+        <div
+                class="card h-full flex flex-row justify-content-between align-items-center"
+        >
+            <div class="w-6">
+                <h5 style="font-size: 14px" class="font-semibold">
+                    Vehicle Management
+                </h5>
+                <div>
+                    <canvas id="vehicleCanvas"></canvas>
+                </div>
+            </div>
+
+            <div   class="flex flex-column w-4 gap-2">
+                <div  (click)="filterByCategory('Running')"
+                      class="flex flex-row align-items-center gap-2 cursor-pointer"
+                      style="color: #13762f; font-size: 14px"
+                >
+                    <div   class="p-0 bg-green-500" style="height: 5px; width: 10px"></div>
+                    <div>Running :{{ categories["Running"] }}</div>
+                </div>
+                <div (click)="filterByCategory('Idle')"
+                     class="flex flex-row align-items-center gap-2 cursor-pointer"
+                     style="color: #dc8217; font-size: 14px"
+                >
+                    <div class="p-0 bg-orange-500" style="height: 5px; width: 10px"></div>
+
+                    <div>Idle :{{ categories["Idle"] }}</div>
+                </div>
+                <div (click)="filterByCategory('Stopped')"
+                     class="flex flex-row align-items-center gap-2 cursor-pointer"
+                     style="color: #b11212; font-size: 14px"
+                >
+                    <div class="p-0 bg-red-500" style="height: 5px; width: 10px"></div>
+
+                    <div>Stop : {{ categories["Stopped"] }}</div>
+                </div>
+                <div (click)="filterByCategory('Offline')"
+                     class="flex flex-row align-items-center gap-2 cursor-pointer"
+                     style="color: #17628c; font-size: 14px"
+                >
+                    <div class="p-0 bg-blue-500" style="height: 5px; width: 10px"></div>
+
+                    <div>Offline :{{ categories["Offline"] }}</div>
+                </div>
+                <div (click)="filterByCategory('NeverConnected')"
+                     class="flex flex-row align-items-center gap-2 cursor-pointer"
+                     style="color: #8d8e8e; font-size: 14px"
+                >
+                    <div class="p-0 bg-gray-500" style="height: 5px; width: 10px"></div>
+
+                    <div>No Data :{{ categories["NeverConnected"] }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHART JS -->
+    <div  *ngIf="layout===1" class="col-12 lg:col-4">
+        <div
+                class="card h-full flex flex-row justify-content-between px-4 align-items-center"
+        >
+            <div class="w-6">
+                <div style="font-size: 14px" class="font-semibold">
+                    Critical Notifications
+                </div>
+
+                <div>
+                    <canvas id="notificationCanvas"></canvas>
+                </div>
+            </div>
+            <div *ngIf="notificationCount === 0">
+                <p>No notifications for today.</p>
+            </div>
+            <ng-container *ngIf="notificationCount !== 0">
+                <div class="flex flex-column justify-content-center w-5 gap-2">
+                    <div
+                            style="font-size: 14px"
+                            *ngFor="let key of notificationChartKeys; let i = index"
+                    >
+                        <ng-container *ngIf="notificationChartValues[i] !== 0">
+                            <div class="flex flex-row gap-2 align-items-center">
+                                <div
+                                        class="p-0"
+                                        [style.height.px]="5"
+                                        [style.width.px]="10"
+                                        [style.backgroundColor]="notificationChartBgColor[i]"
+                                ></div>
+                                <p>
+                                    {{ key }}:
+                                    {{
+                                        (
+                                            (notificationChartValues[i] / notificationCount) *
+                                            100
+                                        ).toFixed(2)
+                                    }}%
+                                </p>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+    <!-- total distance -->
+    <div  *ngIf="layout===1" class="col-12 lg:col-4">
+        <div class="card h-full">
+            <canvas class="h-full" id="lineChart" width="400" height="220"></canvas>
+        </div>
+    </div>
+
+    <div  *ngIf="layout===2" (click)="filterByCategory('All')" class="cursor-pointer col-12 lg:col-6 xl:col-2">
+        <div class="card p-0 overflow-hidden flex flex-column">
+            <div class="flex align-items-center p-3 pb-0">
+                <i class="pi pi-car text-4xl text-blue-500"></i>
+                <div class="ml-3">
+                    <span class="text-blue-500 block white-space-nowrap">Total </span>
+                    <span class="text-blue-500 block text-3xl font-bold">{{
+                            categories["All"]
+                        }}</span>
+                </div>
+            </div>
+            <img
+                    [src]="
+          'assets/demo/images/dashboard/users' +
+          (colorScheme === 'light' ? '' : '-dark') +
+          '.svg'
+        "
+                    class="w-full"
+                    alt="users"
+            />
+        </div>
+    </div>
+
+    <div  *ngIf="layout===2" (click)="filterByCategory('Running')"  class="cursor-pointer col-12 lg:col-6 xl:col-2">
+        <div class="card p-0 overflow-hidden flex flex-column">
+            <div class="flex align-items-center p-3 pb-0">
+                <i class="pi pi-car text-4xl text-green-500"></i>
+                <div class="ml-3">
+                    <span class="text-green-500 block white-space-nowrap">Running </span>
+                    <span class="text-green-500 block text-3xl font-bold">{{
+                            categories["Running"]
+                        }}</span>
+                </div>
+            </div>
+            <img
+                    [src]="'assets/demo/images/dashboard/vehicle_running.svg'"
+                    class="w-full"
+                    alt="conversion"
+            />
+        </div>
+    </div>
+
+    <div  *ngIf="layout===2" (click)="filterByCategory('Idle')"  class="cursor-pointer col-12 lg:col-6 xl:col-2">
+        <div class="card p-0 overflow-hidden flex flex-column">
+            <div class="flex align-items-center p-3 pb-0">
+                <i class="pi pi-car text-4xl text-orange-500"></i>
+                <div class="ml-3">
+                    <span class="text-orange-5 0 block white-space-nowrap">Idle </span>
+                    <span class="text-orange-500 block text-3xl font-bold">{{
+                            categories["Idle"]
+                        }}</span>
+                </div>
+            </div>
+            <img
+                    [src]="'assets/demo/images/dashboard/vehicle_idle.svg'"
+                    class="w-full"
+                    alt="interactions"
+            />
+        </div>
+    </div>
+
+    <div  *ngIf="layout===2" (click)="filterByCategory('Stopped')"  class="cursor-pointer col-12 lg:col-6 xl:col-2">
+        <div class="card p-0 overflow-hidden flex flex-column">
+            <div class="flex align-items-center p-3 pb-0">
+                <i class="pi pi-car text-4xl text-red-500"></i>
+                <div class="ml-3">
+                    <span class="text-red-500 lock white-space-nowrap">Stopped </span>
+                    <span class="text-red-500 block text-3xl font-bold">{{
+                            categories["Stopped"]
+                        }}</span>
+                </div>
+            </div>
+            <img
+                    [src]="'assets/demo/images/dashboard/vehicle_stop.svg'"
+                    class="w-full"
+                    alt="interactions"
+            />
+        </div>
+    </div>
+
+    <div  *ngIf="layout===2" (click)="filterByCategory('Offline')"  class="cursor-pointer col-12 lg:col-6 xl:col-2">
+        <div class="card p-0 overflow-hidden flex flex-column">
+            <div class="flex align-items-center p-3 pb-0">
+                <i class="pi pi-car text-4xl text-blue-500"></i>
+                <div class="ml-3">
+                    <span class="text-blue-500 block white-space-nowrap">Offline </span>
+                    <span class="text-blue-500 block text-3xl font-bold">{{
+                            categories["Offline"]
+                        }}</span>
+                </div>
+            </div>
+            <img
+                    [src]="'assets/demo/images/dashboard/vehicle_offline.svg'"
+                    class="w-full"
+                    alt="interactions"
+            />
+        </div>
+    </div>
+
+    <div *ngIf="layout===2" (click)="filterByCategory('NeverConnected')"  class="cursor-pointer col-12 lg:col-6 xl:col-2">
+        <div class="card p-0 overflow-hidden flex flex-column">
+            <div class="flex align-items-center p-3 pb-0">
+                <i class="pi pi-car text-4xl text-gray-500"></i>
+                <div class="ml-3">
+          <span class="text-gray-500 block white-space-nowrap"
+          >Never Connected
+          </span>
+                    <span class="text-gray-500 block text-3xl font-bold">{{
+                            categories["NeverConnected"]
+                        }}</span>
+                </div>
+            </div>
+            <img
+                    [src]="'assets/demo/images/dashboard/vehicle_never.svg'"
+                    class="w-full"
+                    alt="interactions"
+            />
+        </div>
+    </div>
+    <div class="col-12 xl:col-8 h-full"  >
+        <div class="card" >
+            <div class="flex justify-content-between align-items-center">
+                <h5 style="font-size: 14px" class="font-bold">Device List</h5>
+            </div>
+            <div class="graph h-full">
+                <p-table
+                    #dt
+                    [value]="data"
+                    [paginator]="true"
+                    [rows]="10"
+                    [showCurrentPageReport]="true"
+                    responsiveLayout="scroll"
+                    [scrollable]="true"
+                    scrollHeight="34vh"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                    [rowsPerPageOptions]="[10, 25]"
+                    [globalFilterFields]="['device.vehicleNo', 'device.deviceId']"
+                >
+                    <ng-template pTemplate="caption">
+                        <div
+                                class="flex flex-wrap flex-row-reverse gap-2 align-items-center justify-content-between"
+                        >
+              <span
+                      class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0"
+              >
+                <i class="pi pi-search"></i>
+                <input
+                        pInputText
+                        type="text"
+                        (input)="onGlobalFilter(dt, $event)"
+                        placeholder="Search"
+                        class="w-full text-xl"
+                />
+              </span>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th
+                                    style="padding: 4px 7px"
+                                    pFrozenColumn
+                                    [frozen]="true"
+                                    alignFrozen="left"
+                                    pSortableColumn="vehicleNo"
+                                    class="white-space-nowrap text-2xl"
+                            >
+                                VehicleNo
+                                <p-sortIcon field="vehicleNo"></p-sortIcon>
+                            </th>
+                            <th
+                                    style="padding: 4px 7px"
+                                    pFrozenColumn
+                                    [frozen]="true"
+                                    alignFrozen="left"
+                                    pSortableColumn="deviceId"
+                                    class="white-space-nowrap text-2xl"
+                            >
+                                Device Imei
+                                <p-sortIcon field="deviceId"></p-sortIcon>
+                            </th>
+                            <th
+                                    style="padding: 4px 7px"
+                                    pSortableColumn="timeStamp"
+                                    class="white-space-nowrap text-2xl"
+                            >
+                                Time Stamp
+                                <p-sortIcon field="installationOn"></p-sortIcon>
+                            </th>
+                            <th
+                                    style="padding: 4px 7px"
+                                    pSortableColumn="ignition"
+                                    class="white-space-nowrap text-2xl"
+                            >
+                                Ignition <p-sortIcon field="pSimPhoneNumber"></p-sortIcon>
+                            </th>
+
+                            <th
+                                    style="padding: 4px 7px"
+                                    pSortableColumn="immobilizer"
+                                    class="white-space-nowrap text-2xl"
+                            >
+                                Immobilizer <p-sortIcon field="pointRechargeDue"></p-sortIcon>
+                            </th>
+                            <th
+                                    style="padding: 4px 7px"
+                                    pSortableColumn="batteryVoltage"
+                                    class="white-space-nowrap text-2xl"
+                            >
+                                Battery Voltage
+                                <p-sortIcon field="customerRechargeDue"></p-sortIcon>
+                            </th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-rowDevice let-columns="columns">
+                        <tr>
+                            <td
+                                    style="padding: 2px 7px"
+                                    pFrozenColumn
+                                    [frozen]="true"
+                                    alignFrozen="left"
+                                    class="text-xl"
+                            >
+                                <a
+                                        href="#"
+                                        (click)="showOnMap(rowDevice); $event.preventDefault()"
+                                >{{ rowDevice.device.vehicleNo }}</a
+                                >
+                            </td>
+                            <td
+                                    style="padding: 5px 7px"
+                                    pFrozenColumn
+                                    [frozen]="true"
+                                    alignFrozen="left"
+                                    class="text-xl"
+                            >
+                                {{ rowDevice.device.deviceId }}
+                            </td>
+                            <td style="padding: 5px 7px" class="text-xl">
+                                {{
+                                    rowDevice.position.deviceTime | date : "yyyy-MM-dd , HH:mm:ss"
+                                }}
+                            </td>
+                            <td style="padding: 5px 7px" class="text-xl">
+                                {{ rowDevice.position.details.ign === true ? " On" : "Off" }}
+                            </td>
+                            <td style="padding: 5px 7px" class="text-xl">
+                                {{
+                                    rowDevice.position.details.armed === true
+                                        ? "ON"
+                                        : rowDevice.position.details.armed === false
+                                            ? "OFF"
+                                            : "N/A"
+                                }}
+                            </td>
+                            <td style="padding: 5px 7px" class="text-xl">
+                                {{
+                                    rowDevice.position.details.extVolt
+                                        ? rowDevice.position.details.extVolt + "V"
+                                        : "0V"
+                                }}
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 xl:col-4">
+        <div class="card h-full">
+            <div class="flex justify-content-between align-items-center">
+                <h5 class="m-0 mb-2 font-bold" style="font-size: 14px; ;">Map View</h5>
+            </div>
+            <div class="graph">
+                <div id="dashboardMap" style="height: 43vh"></div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,15 @@
+<div  class=" flex flex-column align-items-center justify-content-center h-screen w-screen absolute top-0 left-0"  
+style="z-index: 3000;background-color: rgba(0, 0, 0, 0.6)">
+<div class="flex flex-column bg-gray-100 xl:w-3 md:w-4 sm:w-6 w-9 p-4 border-round-3xl">
+    <p class="text-2xl font-bold">Enter the Speed Limit</p>
+    <input class="mb-3" type="text" pInputText  [(ngModel)]="speedLimit" />
+    <div class="flex flex-row justify-content-start gap-4">
+        <button pButton         style="background-color: #22c55e"
+        label="Submit"          class=" text-xl"
+  (click)="submitDialog()"></button>
+        <button pButton         style="background-color: #1797B0"
+        (click)="closeDialogBox()"         class=" text-xl"
+ label="Cancel" ></button>
+    </div>
+</div>
+</div>

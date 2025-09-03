@@ -1,0 +1,102 @@
+<div class="p-fluid">
+  <div class="p-grid p-justify-center p-align-center p-h-100">
+    <div class="p-col-12">
+      <div class="p-pb-4">
+        <form [formGroup]="changePasswordForm" (ngSubmit)="onSubmit()">
+          <div class="p-field mt-3">
+   
+            <small
+              *ngIf="
+                changePasswordForm.get('oldPassword')?.touched &&
+                changePasswordForm.get('oldPassword')?.invalid
+              "
+              class="p-error"
+            >
+              Old password is required.
+            </small>
+          </div>
+
+          <div class="p-field mt-3">
+            <label class="text-xl" for="newPassword">New Password</label>
+            <input
+              class="mt-1 text-xl"
+              type="password"
+              id="newPassword"
+              formControlName="newPassword"
+              placeholder="Enter New Password"
+              pInputText
+            />
+            <small
+              *ngIf="
+                changePasswordForm.get('newPassword')?.touched &&
+                changePasswordForm.get('newPassword')?.invalid
+              "
+              class="p-error"
+            >
+              <span
+                *ngIf="changePasswordForm.get('newPassword')?.errors?.['required']"
+                >New password is required.</span
+              >
+              <span
+                *ngIf="changePasswordForm.get('newPassword')?.errors?.['minlength']"
+                >New password must be at least 8 characters long.</span
+              >
+            </small>
+          </div>
+
+          <div class="p-field mt-3">
+            <label class="text-xl" for="confirmPassword"
+              >Confirm New Password</label
+            >
+            <input
+              class="mt-1 text-xl"
+              type="password"
+              id="confirmPassword"
+              formControlName="confirmPassword"
+              placeholder="Enter Confirm Password"
+              pInputText
+            />
+            <small
+              *ngIf="
+                changePasswordForm.get('confirmPassword')?.touched &&
+                changePasswordForm.get('confirmPassword')?.invalid
+              "
+              class="p-error"
+            >
+              <span
+                *ngIf="changePasswordForm.get('confirmPassword')?.errors?.['required']"
+                >Confirm password is required.</span
+              >
+              <span
+                *ngIf="changePasswordForm.get('confirmPassword')?.errors?.['mustMatch']"
+                >Passwords must match.</span
+              >
+            </small>
+          </div>
+
+          <div class="grid p-jc-center mt-4">
+            <div class="col">
+              <button
+              pButton
+                style="background-color: #22c55e"
+                label="Save"
+                type="submit"
+                class="text-xl"
+              ></button>
+            </div>
+            <div class="col">
+              <button
+              pButton
+                style="background-color: #ef4444"
+                label="Cancel"
+                class="text-xl"
+                (click)="onCancel()"
+              ></button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<p-toast></p-toast>

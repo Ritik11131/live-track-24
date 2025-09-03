@@ -1,0 +1,78 @@
+<div class="card">
+ 
+  <p-table
+    #dt
+    [value]="devices"
+    [paginator]="true"
+    [rows]="10"
+    [showCurrentPageReport]="true"
+    responsiveLayout="scroll"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [globalFilterFields]="[
+      'vehicleNo',
+      'deviceId',
+      'deviceImei',
+      'simPhoneNumber'
+    ]"
+  >
+    <ng-template pTemplate="caption">
+      <div
+        class="flex flex-wrap gap-2 align-items-center justify-content-between"
+      >
+        <span
+          class="p-input-icon-left ml-2 w-full sm:w-20rem flex-order-1 sm:flex-order-0"
+        >
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            (input)="onGlobalFilter(dt, $event)"
+            placeholder="Search"
+            class="w-full"
+          />
+        </span>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="vehicleNo" class="white-space-nowrap">
+          Vehicle Number
+          <p-sortIcon field="vehicleNo"></p-sortIcon>
+        </th>
+        <th pSortableColumn="deviceId" class="white-space-nowrap">
+          DeviceId
+          <p-sortIcon field="deviceId"></p-sortIcon>
+        </th>
+        <th pSortableColumn="deviceImei" class="white-space-nowrap">
+          Device Imei
+          <p-sortIcon field="deviceImei"></p-sortIcon>
+        </th>
+        <th pSortableColumn="simPhoneNumber" class="white-space-nowrap">
+          Sim Phone Number
+          <p-sortIcon field="simPhoneNumber"></p-sortIcon>
+        </th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-rowUser let-columns="columns">
+      <tr>
+        <td>{{ rowUser.vehicleNo }}</td>
+        <td>{{ rowUser.deviceId }}</td>
+        <td>{{ rowUser.deviceImei }}</td>
+        <td>{{ rowUser.simPhoneNumber }}</td>
+        <td>   <button
+            pButton
+            pRipple
+            pTooltip="edit device"
+            tooltipPosition="bottom"
+            (click)="navigateToUpdateDevice(rowUser.deviceId)"
+            type="button"
+           
+            class="p-button-rounded p-button-text"
+          ><i class="pi pi-pencil" style="font-size: 1.3rem;"></i></button></td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

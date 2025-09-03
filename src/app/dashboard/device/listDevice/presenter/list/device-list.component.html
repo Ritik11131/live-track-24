@@ -1,0 +1,516 @@
+<p-toast></p-toast>
+<div class="card">
+    <div class="flex justify-content-between mb-2">
+        <h3 class="m-0 font-semibold">Device</h3>
+        <button
+                pButton
+                style="background-color: #1797b0"
+                (click)="showDeviceType()"
+        >
+            Device Type
+        </button>
+    </div>
+    <p-table
+        #dt
+        [value]="filteredDevices"
+        [paginator]="true"
+        [rows]="10"
+        dataKey="deviceId"
+        rowExpandMode="single"
+        [showCurrentPageReport]="true"
+        responsiveLayout="scroll"
+        [scrollable]="true"
+        scrollHeight="65vh"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [rowsPerPageOptions]="[10, 25, 50]"
+        [(selection)]="selectedDevices"
+        [globalFilterFields]="[
+      'vehicleNo',
+      'deviceId',
+      'deviceImei',
+      'simPhoneNumber',
+      'simSecPhoneNumber',
+      'fkVehicleType',
+      'description',
+      'creationTime',
+      'installationOn',
+      'fkDeviceType',
+      'validity'
+    ]"
+    >
+        <ng-template pTemplate="caption">
+            <div
+                    class="flex flex-wrap gap-2 align-items-center justify-content-between"
+            >
+        <span>
+          <button
+                  *ngIf="
+              !isCustomer &&
+              config.title == 'Trakefy'
+            "
+                  [disabled]="!(selectedDevices.length != 0)"
+                  pButton
+                  type="button"
+                  label="Delete"
+                  (click)="openDialog()"
+                  class="p-button-danger text-xl mr-2"
+          >
+            <i class="pi pi-trash mr-2"></i>
+          </button>
+
+          <button
+                  *ngIf="!isCustomer"
+                  [disabled]="!(selectedDevices.length != 0)"
+                  pButton
+                  type="button"
+                  label="Link Multiple Devices"
+                  (click)="linkMultipleDevices()"
+                  style="background-color: #1797b0"
+                  class="mr-2 text-xl"
+          ></button>
+          <button
+                  *ngIf="!isCustomer && config.subscriptionPlan"
+                  [disabled]="!(selectedDevices.length != 0)"
+                  pButton
+                  type="button"
+                  label="Link Plan "
+                  (click)="linkPlanWithDevices()"
+                  style="background-color: #1797b0"
+                  class="mr-2 text-xl"
+          ></button>
+          <button
+                  *ngIf="!isCustomer"
+                  [disabled]="!(selectedDevices.length != 0)"
+                  pButton
+                  type="button"
+                  label="Send Command"
+                  (click)="sendCommand()"
+                  style="background-color: #1797b0"
+                  class="mr-2 text-xl"
+          ></button>
+          <span
+                  class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0"
+          >
+            <i class="pi pi-search"></i>
+            <input
+                    pInputText
+                    type="text"
+                    (input)="onGlobalFilter(dt, $event)"
+                    placeholder="Search"
+                    class="w-full text-xl"
+            />
+          </span>
+        </span>
+
+                <div class="flex gap-2">
+                    <p-dropdown
+                            class="text-3xl"
+                            placeholder="Select User"
+                            id="fkCustomerId"
+                            [options]="customers"
+                            [filter]="true"
+                            [resetFilterOnHide]="true"
+                            optionLabel="userName"
+                            optionValue="id"
+                            (onChange)="getDevicesByUserId($event.value)"
+                    ></p-dropdown>
+
+                    <button
+                            *ngIf="!isCustomer"
+                            pButton
+                            (click)="openFileUploadComponent()"
+                            class="p-button-outlined border-dashed w-full sm:w-auto flex-order-0 sm:flex-order-1"
+                            icon="pi pi-cloud-upload"
+                            label="Upload a file"
+                    ></button>
+
+                    <button
+                            (click)="toggleDevices()"
+                            pButton
+                            class="p-button-outlined w-full text-xl sm:w-auto flex-order-0 sm:flex-order-1"
+                            label="{{showExpireDevices ? 'Show All Devices' : 'show Expired Devices'}}"
+                    ></button>
+
+                    <button
+                            (click)="exportDevices()"
+                            pButton
+                            icon="pi pi-file-export"
+                            class="p-button-outlined w-full text-xl sm:w-auto flex-order-0 sm:flex-order-1"
+                            label="Export"
+                    ></button>
+
+                    <button
+                            *ngIf="!isCustomer"
+                            (click)="navigateToCreateDevice()"
+                            pButton
+                            class="p-button-outlined w-full text-xl sm:w-auto flex-order-0 sm:flex-order-1"
+                            icon="pi pi-user-plus"
+                            label="Add New Device"
+                    ></button>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr class="text-2xl">
+                <th *ngIf="!isCustomer"></th>
+
+                <th pSortableColumn="vehicleNo" class="white-space-nowrap">
+                    VehicleNo
+                    <p-sortIcon field="vehicleNo"></p-sortIcon>
+                </th>
+                <th pSortableColumn="deviceId" class="white-space-nowrap">
+                    Unique Id
+                    <p-sortIcon field="deviceId"></p-sortIcon>
+                </th>
+                <th pSortableColumn="deviceImei" class="white-space-nowrap">
+                    Device IMEI
+                    <p-sortIcon field="deviceImei"></p-sortIcon>
+                </th>
+                <th pSortableColumn="simPhoneNumber" class="white-space-nowrap">
+                    P.Phone No
+                    <p-sortIcon field="simPhoneNumber"></p-sortIcon>
+                </th>
+                <th pSortableColumn="simSecPhoneNumber" class="white-space-nowrap">
+                    S.Phone No
+                    <p-sortIcon field="simSecPhoneNumber"></p-sortIcon>
+                </th>
+
+                <th pSortableColumn="fkDeviceType" class="white-space-nowrap">
+                    Device Type
+                    <p-sortIcon field="fkDeviceType"></p-sortIcon>
+                </th>
+
+                <th pSortableColumn="fkVehicleType" class="white-space-nowrap">
+                    Vehicle Type
+                    <p-sortIcon field="fkVehicleType"></p-sortIcon>
+                </th>
+
+                <th pSortableColumn="installationOn" class="white-space-nowrap">
+                    Installation Date
+                    <p-sortIcon field="installationOn"></p-sortIcon>
+                </th>
+                <th pSortableColumn="creationTime" class="white-space-nowrap">
+                    Created Date
+                    <p-sortIcon field="creationTime"></p-sortIcon>
+                </th>
+
+                <th pSortableColumn="validity" class="white-space-nowrap">
+                    Validity
+                    <p-sortIcon field="validity"></p-sortIcon>
+                </th>
+
+                <!-- <th
+                  style="min-width: 175px; padding-left: 70px"
+                  pFrozenColumn
+                  [frozen]="true"
+                  alignFrozen="right"
+                > -->
+                <th> More Actions</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-rowUser let-expanded="expanded">
+            <tr class="text-xl">
+                <ng-container *ngIf="deviceData; else deviceinfo">
+                    <!-- Skeleton loading UI -->
+                    <td>
+                        <p-skeleton></p-skeleton>
+                    </td>
+                    <td>
+                        <p-skeleton></p-skeleton>
+                    </td>
+                    <td>
+                        <p-skeleton></p-skeleton>
+                    </td>
+                    <td>
+                        <p-skeleton></p-skeleton>
+                    </td>
+                    <td>
+                        <p-skeleton></p-skeleton>
+                    </td>
+                    <td>
+                        <p-skeleton></p-skeleton>
+                    </td>
+                    <td>
+                        <p-skeleton></p-skeleton>
+                    </td>
+                    <td>
+                        <p-skeleton></p-skeleton>
+                    </td>
+                    <td>
+                        <p-skeleton></p-skeleton>
+                    </td>
+                    <td>
+                        <p-skeleton></p-skeleton>
+                    </td>
+                </ng-container>
+                <ng-template #deviceinfo>
+                    <!-- Actual data -->
+                    <td *ngIf="!isCustomer">
+                        <p-tableCheckbox [value]="rowUser"></p-tableCheckbox>
+                    </td>
+
+                    <td>{{ rowUser.vehicleNo }}</td>
+                    <td>{{ rowUser.deviceId }}</td>
+                    <td>{{ rowUser.deviceImei }}</td>
+                    <td>{{ rowUser.simPhoneNumber }}</td>
+                    <td>{{ rowUser.simSecPhoneNumber }}</td>
+                    <td>
+                        {{ deviceService.getDeviceTypeLabel(rowUser.fkDeviceType) }}
+                    </td>
+                    <td>
+                        {{ deviceService.getVehicleTypeLabel(rowUser.fkVehicleType) }}
+                    </td>
+                    <td>{{ rowUser.installationOn }}</td>
+                    <td>{{ rowUser.creationTime | date : "yyyy-MM-dd" }}</td>
+                    <td>{{ rowUser.validity.customerRechargeDate }}</td>
+                    <!-- <td pFrozenColumn [frozen]="true" alignFrozen="right"> -->
+                    <!--          <td pFrozenColumn [frozen]="true" alignFrozen="right">-->
+                    <!--&lt;!&ndash;              <i class="pi pi-ellipsis-v" (click)="toggleList(rowUser.id)"></i>&ndash;&gt;-->
+                    <!--&lt;!&ndash;              &ndash;&gt;-->
+                    <!--            <button pButton (click)="toggleList(rowUser.id)">-->
+                    <!--              More Actions-->
+                    <!--            </button>-->
+
+                    <!--            <ul *ngIf="visibleDropdown === rowUser.id" class="dropdown-list">-->
+                    <!--              <li>-->
+                    <!--                <button-->
+                    <!--                  pRipple-->
+                    <!--                  pButton-->
+                    <!--                  label="view user"-->
+                    <!--                  [pRowToggler]="rowUser"-->
+                    <!--                  (click)="toggleRow(rowUser); $event.stopPropagation()"-->
+                    <!--                  type="button"-->
+                    <!--                  class="p-button-rounded p-button-text"-->
+                    <!--                >-->
+                    <!--                  <i-->
+                    <!--                    class="mr-2"-->
+                    <!--                    [ngClass]="expanded ? 'pi pi-eye' : 'pi pi-eye-slash'"-->
+                    <!--                    style="font-size: 1.5rem; color: purple"-->
+                    <!--                  ></i>-->
+                    <!--                </button>-->
+                    <!--                <button-->
+                    <!--                  *ngIf="!isCustomer"-->
+                    <!--                  pButton-->
+                    <!--                  pRipple-->
+                    <!--                  label="Recharge Date"-->
+                    <!--                  (click)="setNextValidity(rowUser)"-->
+                    <!--                  type="button"-->
+                    <!--                  class="p-button-rounded p-button-text white-space-nowrap"-->
+                    <!--                >-->
+                    <!--                  <i-->
+                    <!--                    class="pi pi-money-bill mr-2"-->
+                    <!--                    style="font-size: 1.3rem"-->
+                    <!--                  ></i>-->
+                    <!--                </button>-->
+                    <!--              </li>-->
+                    <!--              <li>-->
+                    <!--                <button-->
+                    <!--                  *ngIf="isCustomer"-->
+                    <!--                  pButton-->
+                    <!--                  pRipple-->
+                    <!--                  label="edit device"-->
+                    <!--                  (click)="changedevice(rowUser.id)"-->
+                    <!--                  type="button"-->
+                    <!--                  class="p-button-rounded p-button-text white-space-nowrap"-->
+                    <!--                >-->
+                    <!--                  <i class="pi pi-pencil mr-2" style="font-size: 1.3rem"></i>-->
+                    <!--                </button>-->
+                    <!--              </li>-->
+                    <!--              <li>-->
+                    <!--                <button-->
+                    <!--                  *ngIf="!isCustomer"-->
+                    <!--                  pButton-->
+                    <!--                  pRipple-->
+                    <!--                  label="edit device"-->
+                    <!--                  (click)="navigateToUpdateDevice(rowUser.id)"-->
+                    <!--                  type="button"-->
+                    <!--                  class="p-button-rounded p-button-text white-space-nowrap"-->
+                    <!--                >-->
+                    <!--                  <i class="pi pi-pencil mr-2" style="font-size: 1.3rem"></i>-->
+                    <!--                </button>-->
+                    <!--              </li>-->
+                    <!--              <li>-->
+                    <!--                <button-->
+                    <!--                  pButton-->
+                    <!--                  pRipple-->
+                    <!--                  label="link user"-->
+                    <!--                  (click)="linkUser(rowUser.deviceId, rowUser.id)"-->
+                    <!--                  type="button"-->
+                    <!--                  class="p-button-rounded p-button-text white-space-nowrap"-->
+                    <!--                >-->
+                    <!--                  <i-->
+                    <!--                    class="pi pi-link mr-2"-->
+                    <!--                    style="font-size: 1.5rem; color: green"-->
+                    <!--                  ></i>-->
+                    <!--                </button>-->
+                    <!--              </li>-->
+                    <!--            </ul>-->
+                    <!--          </td>-->
+                    <td pFrozenColumn [frozen]="true" alignFrozen="right">
+                        <i class="pi pi-pencil mx-1" *ngIf="isCustomer"
+                           pRipple
+                           pTooltip="edit device"
+                           tooltipPosition="bottom"
+                           (click)="changedevice(rowUser.id)" style="font-size: 1.3rem"></i>
+                        <i *ngIf="!isCustomer"
+                           pTooltip="edit device"
+                           tooltipPosition="bottom"
+                           (click)="navigateToUpdateDevice(rowUser.id)" class="pi pi-pencil  mx-2"
+                           style="font-size: 1.3rem"></i>
+                        <i class="pi pi-link  mx-1" pTooltip="link user"
+                           tooltipPosition="bottom"
+                           (click)="linkUser(rowUser.deviceId, rowUser.id)" style="font-size: 1.5rem; color: green"></i>
+                        <i [ngClass]="expanded ? 'pi pi-eye  mx-1' : 'pi pi-eye-slash  mx-1'" pTooltip="view user"
+                           tooltipPosition="bottom"
+                           [pRowToggler]="rowUser"
+                           (click)="toggleRow(rowUser); $event.stopPropagation()"
+                           style="font-size: 1.5rem; color: purple"></i>
+                        <i *ngIf="config.subscriptionPlan || (config.title == 'Grl Track Tech' && this.currentUserId == 84)" ngClass="pi pi-money-bill  mx-1" pTooltip="Update Validaity"
+                           tooltipPosition="bottom"
+                           [pRowToggler]="rowUser"
+                           (click)="setNextValidity(rowUser);" style="font-size: 1.5rem; color: purple"></i>
+                    </td>
+                </ng-template>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="rowexpansion" let-rowUser>
+            <tr class="bg-gray-100">
+                <td colspan="12">
+                    <div class="p-3">
+                        <p-table
+                            #dt1
+                            [scrollable]="true"
+                            responsiveLayout="scroll"
+                            [value]="linkedUsers[rowUser.id]"
+                            dataKey="userId"
+                            scrollHeight="30vh"
+                            [globalFilterFields]="[
+                'userName',
+                'loginId',
+                'mobileNo',
+                'email'
+              ]"
+                        >
+                            <ng-template pTemplate="caption">
+                                <div
+                                        class="flex flex-wrap gap-2 align-items-center justify-content-end"
+                                >
+                  <span
+                          class="p-input-icon-left mt-2 ml-2 w-full sm:w-20rem flex-order-1 sm:flex-order-0"
+                  >
+                    <i class="pi pi-search"></i>
+                    <input
+                            pInputText
+                            type="text"
+                            (input)="onDropDownGlobalFilter(dt1, $event)"
+                            placeholder="Search"
+                            class="w-full text-xl"
+                    />
+                  </span>
+                                </div>
+                            </ng-template>
+                            <ng-template pTemplate="header">
+                                <tr class="text-2xl">
+                                    <th pSortableColumn="userName">
+                                        Username
+                                        <p-sortIcon field="userName"></p-sortIcon>
+                                    </th>
+                                    <th pSortableColumn="loginId">
+                                        LoginId
+                                        <p-sortIcon field="loginId"></p-sortIcon>
+                                    </th>
+                                    <th pSortableColumn="email">
+                                        Email
+                                        <p-sortIcon field="email"></p-sortIcon>
+                                    </th>
+                                    <th pSortableColumn="mobileNo">
+                                        Mobile No.
+                                        <p-sortIcon field="mobileNo"></p-sortIcon>
+                                    </th>
+                                    <th
+                                            style="min-width: 100px"
+                                            pFrozenColumn
+                                            [frozen]="true"
+                                            alignFrozen="right"
+                                    >
+                                        Unlink User
+                                    </th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-user>
+                                <tr class="text-xl">
+                                    <ng-container *ngIf="userData; else userinfo">
+                                        <!-- Skeleton loading UI -->
+                                        <td>
+                                            <p-skeleton></p-skeleton>
+                                        </td>
+                                        <td>
+                                            <p-skeleton></p-skeleton>
+                                        </td>
+                                        <td>
+                                            <p-skeleton></p-skeleton>
+                                        </td>
+                                        <td>
+                                            <p-skeleton></p-skeleton>
+                                        </td>
+                                        <td>
+                                            <p-skeleton></p-skeleton>
+                                        </td>
+                                    </ng-container>
+                                    <ng-template #userinfo>
+                                        <!-- Actual data -->
+                                        <td>{{ user.userName }}</td>
+                                        <td>{{ user.loginId }}</td>
+                                        <td>{{ user.email }}</td>
+                                        <td>{{ user.mobileNo }}</td>
+                                        <td pFrozenColumn [frozen]="true" alignFrozen="right">
+                                            <button
+                                                    pButton
+                                                    pRipple
+                                                    pTooltip="unlink user"
+                                                    tooltipPosition="bottom"
+                                                    (click)="
+                          unLinkUser(
+                            rowUser,
+                            user.mappingId,
+                            rowUser.id,
+                            user.userId
+                          )
+                        "
+                                                    type="button"
+                                                    class="p-button-rounded p-button-text"
+                                            >
+                                                <img
+                                                        src="assets/demo/images/dashboard/unlink-icon.svg"
+                                                        style="width: 20px; height: 20px"
+                                                />
+                                            </button>
+                                        </td>
+                                    </ng-template>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="emptymessage">
+                                <tr>
+                                    <td colspan="6">
+                                        There are no user linked with this device.
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+<app-link-user
+        (closeForm)="closePopupForm($event)"
+        *ngIf="linkUserForm"
+></app-link-user>
+<app-update
+        *ngIf="updateUserForm"
+        (closeUpdateForm)="closeUpdatePopupForm($event)"
+></app-update>
+<p-confirmDialog [style]="{ 'z-index': '3000' }"></p-confirmDialog>

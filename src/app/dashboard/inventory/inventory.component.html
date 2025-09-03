@@ -1,0 +1,81 @@
+<div class="grid">
+    <div *ngIf="message>0" class="col-12 lg:col-6 xl:col-3">
+      <div class="card p-0 overflow-hidden flex flex-column">
+        <div class="flex align-items-center p-3">
+          <i class="pi pi-car text-6xl text-blue-500"></i>
+          <div class="ml-3">
+            <span class="text-blue-500 block white-space-nowrap"
+              >Total Vehicles</span
+            >
+            <span class="text-blue-500 block text-4xl font-bold"></span>
+          </div>
+        </div>
+        <img
+        [src]="'assets/demo/images/dashboard/vehicle_running.svg'"
+        class="w-full"
+        alt="conversion"
+      />
+        </div>
+    </div>
+    <div *ngIf="message>1"  class="col-12 lg:col-6 xl:col-3">
+      <div class="card p-0 overflow-hidden flex flex-column">
+        <div class="flex align-items-center p-3">
+          <i class="pi pi-car text-6xl text-green-500"></i>
+          <div class="ml-3">
+            <span class="text-green-500 block white-space-nowrap"
+              >Running Vehicles</span
+            >
+            <span class="text-green-500 block text-4xl font-bold"></span>
+          </div>
+        </div>
+        <img
+          [src]="'assets/demo/images/dashboard/vehicle_running.svg'"
+          class="w-full"
+          alt="conversion"
+        />
+      </div>
+    </div>
+    <div *ngIf="message>2"  class="col-12 lg:col-6 xl:col-3">
+      <div class="card h-full p-0 overflow-hidden flex flex-column">
+        <div class="flex align-items-center p-3">
+          <i class="pi pi-car text-6xl text-orange-500"></i>
+          <div class="ml-3">
+            <span class="text-orange-500 block white-space-nowrap"
+              >Idle Vehicles</span
+            >
+            <span class="text-orange-500 block text-4xl font-bold"></span>
+          </div>
+        </div>
+        <img
+          [src]="'assets/demo/images/dashboard/vehicle_idle.svg'"
+          class="w-full mt-auto"
+          alt="interactions"
+        />
+      </div>
+    </div>
+    <div *ngIf="message>3"  class="col-12 lg:col-6 xl:col-3">
+      <div class="card h-full p-0 overflow-hidden flex flex-column">
+        <div class="flex align-items-center p-3">
+          <i class="pi pi-car text-6xl text-red-500"></i>
+          <div class="ml-3">
+            <span class="text-red-500 block white-space-nowrap"
+              >Stopped Vehicle</span
+            >
+            <span class="text-red-500 block text-4xl font-bold"></span>
+          </div>
+        </div>
+        <img
+          [src]="'assets/demo/images/dashboard/vehicle_stop.svg'"
+          class="w-full mt-auto"
+          alt="interactions"
+        />
+      </div>
+    </div>
+    <div class="col-12 ">
+        <p-tabMenu 
+          [model]="items"
+         
+        ></p-tabMenu>
+        <router-outlet ></router-outlet>
+      </div>
+    </div>

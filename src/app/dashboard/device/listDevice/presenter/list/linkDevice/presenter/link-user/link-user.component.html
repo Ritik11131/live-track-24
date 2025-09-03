@@ -1,0 +1,62 @@
+<div
+  class="h-full flex align-items-center justify-content-center h-screen w-screen absolute top-0 left-0"
+  style="background-color: rgba(0, 0, 0, 0.7); z-index: 3000"
+>
+  <form [formGroup]="userLinkForm" (ngSubmit)="linkUserTODevice()">
+    <div
+      class="surface-card p-5 shadow-2 flex flex-column w-11 sm:w-30rem"
+      style="border-radius: 14px"
+    >
+      <div class="flex justify-content-between">
+        <p class="text-2xl font-bold">Link User</p>
+        <i class="pi pi-times cursor-pointer" (click)="closeUserLinkForm()"></i>
+      </div>
+
+      <span class="mb-4">
+        <label class="text-xl" for="uniqueId">Unique Id</label>
+        <input
+          type="text"
+          name="uniqueId"
+          pInputText
+          id="uniqueId"
+          formControlName="uniqueId"
+          readonly
+          class="w-full text-xl mt-2"
+        />
+      </span>
+      <!-- <span class="mb-4">
+        <label for="deviceImei">Device Id</label>
+        <input
+          type="text"
+          id="deviceId"
+          name="deviceId"
+          pInputText
+          formControlName="deviceId"
+          readonly
+          class="w-full mt-2"
+        />
+      </span> -->
+
+   <span class="flex flex-column justify-content-center" >
+<label   for="userName">UserName</label>
+  <p-multiSelect
+    [options]="users"
+    formControlName="selectedUsers"
+    placeholder="Select User"
+    optionLabel="loginId"
+    display="chip"
+    [style]="{ width: '100%', 'max-width': '100%' }" 
+    [showClear]="true"
+  ></p-multiSelect>
+   </span>
+      <button
+        pButton
+        pRipple
+        type="submit"
+        label="Add User"
+        class="p-3 mt-4 w-full"
+        style="background-color: #1797B0; color: white"
+      ></button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,14 @@
+
+.vehicle-info{
+    font-size: 11px;
+   
+}
+/* Define styles for small screen */
+.chart-small {
+    height: 170px; /* Adjust the height as needed */
+  }
+  
+  /* Define styles for large screen */
+  .chart-large {
+    height: 400px; /* Adjust the height as needed */
+  }

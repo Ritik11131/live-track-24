@@ -1,0 +1,88 @@
+<div class="flex flex-column card jc-center ai-center md:w-3 w-6" style="height: 75vh">
+  <h2>Color Schema</h2>
+  <div class="flex flex-row ai-center mb-2">
+    <div class="flex justify-content-center align-items-center mr-3 gap-2">
+      <p-radioButton
+        name="color"
+        value="dark"
+        inputId="dark"
+        [(ngModel)]="selectedTheme"
+        (onClick)="changeTheme()"
+      ></p-radioButton>
+      <label for="dark" class="mb-0">Dark</label>
+    </div>
+    <div class="flex justify-content-center align-items-center mr-3 gap-2">
+      <p-radioButton
+        name="color"
+        value="light"
+        inputId="light"
+        [(ngModel)]="selectedTheme"
+        (onClick)="changeTheme()"
+      ></p-radioButton>
+      <label for="light" class="mb-0">Light</label>
+    </div>
+  </div>
+  <h2>Themes</h2>
+  <div class="flex flex-column gap-2">
+    <div class="flex flex-wrap gap-2">
+      <div
+     
+        class="mr-1 mb-1 flex justify-content-center align-items-center w-2rem cursor-pointer h-2rem border-round-xl"
+        style="background-color: blue"
+        (click)="selectColor('blue');selectedColor = 'blue'"  
+      ><i *ngIf="selectedColor === 'blue'" class="pi pi-check" style="color: black"></i></div>
+      <div
+        class="mr-1 mb-1 flex justify-content-center align-items-center w-2rem cursor-pointer h-2rem border-round-xl"
+        style="background-color: cyan"
+        (click)="selectColor('cyan');selectedColor = 'cyan'"
+      ><i *ngIf="selectedColor === 'cyan'" class="pi pi-check" style="color: black"></i></div>
+      <div
+        class="mr-1 mb-1 flex justify-content-center align-items-center w-2rem cursor-pointer h-2rem border-round-xl"
+        style="background-color: deeppink"
+        (click)="selectColor('deeppurple');selectedColor = 'deeppurple'"
+      ><i *ngIf="selectedColor === 'deeppurple'" class="pi pi-check" style="color: black"></i></div>
+      <div
+        class="mr-1 mb-1 flex justify-content-center align-items-center w-2rem cursor-pointer h-2rem border-round-xl"
+        style="background-color: green"
+        (click)="selectColor('green');selectedColor = 'green'"
+      ><i *ngIf="selectedColor === 'green'" class="pi pi-check" style="color: black"></i></div>
+      <div
+        class="mr-1 mb-1 flex justify-content-center align-items-center w-2rem cursor-pointer h-2rem border-round-xl"
+        style="background-color: indigo"
+        (click)="selectColor('indigo');selectedColor = 'indigo'"
+      ><i *ngIf="selectedColor === 'indigo'" class="pi pi-check" style="color: black"></i></div>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <div
+        class="mr-1 mb-1 flex justify-content-center align-items-center w-2rem cursor-pointer h-2rem border-round-xl"
+        style="background-color: lime"
+        (click)="selectColor('lime');selectedColor = 'lime'"
+      ><i *ngIf="selectedColor === 'lime'" class="pi pi-check" style="color: black"></i></div>
+      <div
+        class="mr-1 mb-1 flex justify-content-center align-items-center w-2rem cursor-pointer h-2rem border-round-xl"
+        style="background-color: orange"
+        (click)="selectColor('orange');selectedColor = 'orange'"
+      ><i *ngIf="selectedColor === 'orange'" class="pi pi-check" style="color: black"></i></div>
+      <div
+        class="mr-1 mb-1 flex justify-content-center align-items-center w-2rem cursor-pointer h-2rem border-round-xl"
+        style="background-color: pink"
+        (click)="selectColor('pink');selectedColor = 'pink'"
+      ><i *ngIf="selectedColor === 'pink'" class="pi pi-check" style="color: black"></i></div>
+      <div
+        class="mr-1 mb-1 flex justify-content-center align-items-center w-2rem cursor-pointer h-2rem border-round-xl"
+        style="background-color: purple"
+        (click)="selectColor('purple');selectedColor = 'purple'"
+      ><i *ngIf="selectedColor === 'purple'" class="pi pi-check" style="color: black"></i></div>
+      <div
+        class="mr-1 mb-1 flex justify-content-center align-items-center w-2rem cursor-pointer h-2rem border-round-xl"
+        style="background-color: yellow"
+        (click)="selectColor('yellow');selectedColor = 'yellow'"
+      ><i *ngIf="selectedColor === 'yellow'" class="pi pi-check" style="color: black"></i></div>
+      <div
+      class="mr-1 mb-1 flex justify-content-center align-items-center w-2rem cursor-pointer h-2rem border-round-xl"
+      style="background-color: black"
+      (click)="selectColor('black');selectedColor = 'black'"
+    ><i *ngIf="selectedColor === 'black'" class="pi pi-check" style="color: white"></i></div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPS Track Player with API</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #333;
+            font-family: Arial, sans-serif;
+        }
+
+        #map {
+            width: 100%;
+            height: 70vh;
+            z-index: 0;
+        }
+
+        .title {
+            color: #fff;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 2em;
+        }
+
+        .controls {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            text-align: center;
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            min-width: 250px;
+        }
+
+        .controls button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .controls button:hover:not(:disabled) {
+            background: #2980b9;
+        }
+
+        .controls button:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+        }
+
+        .controls button.active {
+            background: #e74c3c;
+        }
+
+        .controls label {
+            color: white;
+            display: block;
+            margin: 10px 0 5px 0;
+        }
+
+        .controls input[type="range"] {
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        .status-info {
+            color: #fff;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            min-width: 300px;
+        }
+
+        .status-item {
+            margin: 5px 0;
+        }
+
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            z-index: 2000;
+            display: none;
+        }
+
+        .error {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #e74c3c;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            z-index: 2000;
+            display: none;
+            max-width: 500px;
+        }
+
+        /* Custom styles for rotated marker */
+        .rotated-car-marker {
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+<h1 class="title">🚗 GPS Track Player with API 🚗</h1>
+
+<div class="controls">
+    <button id="loadDataBtn">📡 Load Track Data</button>
+    <button id="playPauseBtn" disabled>▶️ Play</button>
+    <button id="resetBtn" disabled>🔄 Reset</button>
+
+    <label for="speedRange">Speed:</label>
+    <input type="range" id="speedRange" min="1" max="10" value="3" disabled>
+    <span id="speedValue">3x</span>
+
+    <label for="progressRange">Progress:</label>
+    <input type="range" id="progressRange" min="0" max="100" value="0" disabled>
+    <span id="progressValue">0%</span>
+</div>
+
+<div class="status-info">
+    <div class="status-item"><strong>Status:</strong> <span id="statusDisplay">Ready to load data</span></div>
+    <div class="status-item"><strong>Position:</strong> <span id="positionDisplay">-</span></div>
+    <div class="status-item"><strong>Heading:</strong> <span id="headingDisplay">-</span></div>
+    <div class="status-item"><strong>Progress:</strong> <span id="progressDisplay">0%</span></div>
+    <div class="status-item"><strong>Index:</strong> <span id="indexDisplay">0/0</span></div>
+    <div class="status-item"><strong>Speed:</strong> <span id="speedDisplay">0 km/h</span></div>
+</div>
+
+<div id="loadingIndicator" class="loading">
+    📡 Loading track data...
+</div>
+
+<div id="errorMessage" class="error"></div>
+
+<div id="map"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Leaflet Rotated Marker Plugin -->
+<script src="https://cdn.jsdelivr.net/npm/leaflet-rotatedmarker@0.2.0/leaflet.rotatedMarker.js"></script>
+
+<script>
+    // Initialize map
+    let map = L.map("map", {
+        zoom: 12,
+        maxZoom: 18,
+        center: [28.4547, 77.0624],
+    });
+
+    // Add tile layer
+    const satelliteMap = L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            attribution: '© OpenStreetMap contributors'
+        }
+    ).addTo(map);
+
+    // Calculate bearing between two points
+    function calculateBearing(lat1, lng1, lat2, lng2) {
+        const dLng = (lng2 - lng1) * Math.PI / 180;
+        const lat1Rad = lat1 * Math.PI / 180;
+        const lat2Rad = lat2 * Math.PI / 180;
+
+        const y = Math.sin(dLng) * Math.cos(lat2Rad);
+        const x = Math.cos(lat1Rad) * Math.sin(lat2Rad) - Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLng);
+
+        let bearing = Math.atan2(y, x) * 180 / Math.PI;
+        return (bearing + 360) % 360; // Normalize to 0-360
+    }
+
+    // Custom TrackPlayer with proper rotation
+    class CustomTrackPlayer {
+        constructor(path, options = {}) {
+            this.path = path;
+            this.options = {
+                speed: options.speed || 800,
+                markerIcon: options.markerIcon,
+                ...options
+            };
+
+            this.currentIndex = 0;
+            this.isPlaying = false;
+            this.animationId = null;
+            this.marker = null;
+            this.passedLine = null;
+            this.fullLine = null;
+            this.lastTime = 0;
+            this.eventHandlers = {};
+            this.currentBearing = 0;
+
+            this.initialize();
+        }
+
+        initialize() {
+            // Create full route line
+            this.fullLine = L.polyline(this.path.map(p => [p.lat, p.lng]), {
+                color: '#e74c3c',
+                weight: 4,
+                opacity: 0.7
+            });
+
+            // Create passed line
+            this.passedLine = L.polyline([], {
+                color: '#27ae60',
+                weight: 6,
+                opacity: 0.9
+            });
+
+            // Create rotated marker
+            if (this.path.length > 0) {
+                this.marker = L.marker([this.path[0].lat, this.path[0].lng], {
+                    icon: this.options.markerIcon,
+                    rotationAngle: 0,
+                    rotationOrigin: 'center'
+                });
+
+                // Add rotation support if plugin is available
+                if (this.marker.setRotationAngle) {
+                    console.log('Using Leaflet RotatedMarker plugin for rotation');
+                } else {
+                    console.log('RotatedMarker plugin not available, using manual rotation');
+                }
+            }
+        }
+
+        addTo(map) {
+            if (this.fullLine) this.fullLine.addTo(map);
+            if (this.passedLine) this.passedLine.addTo(map);
+            if (this.marker) this.marker.addTo(map);
+            return this;
+        }
+
+        start() {
+            if (this.isPlaying) return;
+            this.isPlaying = true;
+            this.lastTime = performance.now();
+            this.animate(this.lastTime);
+            this.fireEvent('start');
+        }
+
+        pause() {
+            this.isPlaying = false;
+            if (this.animationId) {
+                cancelAnimationFrame(this.animationId);
+                this.animationId = null;
+            }
+            this.fireEvent('pause');
+        }
+
+        setSpeed(speed) {
+            this.options.speed = speed;
+        }
+
+        setProgress(progress) {
+            this.currentIndex = Math.floor(progress * (this.path.length - 1));
+            this.updatePosition();
+        }
+
+        animate(currentTime) {
+            if (!this.isPlaying) return;
+
+            const deltaTime = currentTime - this.lastTime;
+            this.lastTime = currentTime;
+
+            // Speed adjustment for smoother animation
+            const increment = (this.options.speed * deltaTime) / 100000;
+            this.currentIndex += increment;
+
+            if (this.currentIndex >= this.path.length - 1) {
+                this.currentIndex = this.path.length - 1;
+                this.updatePosition();
+                this.isPlaying = false;
+                this.fireEvent('finished');
+                return;
+            }
+
+            this.updatePosition();
+
+            if (this.isPlaying) {
+                this.animationId = requestAnimationFrame((time) => this.animate(time));
+            }
+        }
+
+        updatePosition() {
+            const index = Math.floor(this.currentIndex);
+            const progress = this.currentIndex / (this.path.length - 1);
+
+            if (index < this.path.length) {
+                const currentPos = this.path[index];
+                const latlng = [currentPos.lat, currentPos.lng];
+
+                // Calculate bearing for rotation
+                if (index > 0) {
+                    const prevPos = this.path[index - 1];
+                    this.currentBearing = calculateBearing(
+                        prevPos.lat, prevPos.lng,
+                        currentPos.lat, currentPos.lng
+                    );
+                }
+
+                // Update marker position and rotation
+                if (this.marker) {
+                    this.marker.setLatLng(latlng);
+
+                    // Apply rotation
+                    if (this.marker.setRotationAngle) {
+                        // Use RotatedMarker plugin if available
+                        this.marker.setRotationAngle(this.currentBearing);
+                    } else {
+                        // Manual rotation fallback
+                        const markerElement = this.marker.getElement();
+                        if (markerElement) {
+                            markerElement.style.transform = `rotate(${this.currentBearing}deg)`;
+                            markerElement.style.transformOrigin = 'center';
+                        }
+                    }
+
+                    map.panTo(latlng);
+                }
+
+                // Update passed line
+                const passedPoints = this.path.slice(0, index + 1).map(p => [p.lat, p.lng]);
+                this.passedLine.setLatLngs(passedPoints);
+
+                // Fire progress event with bearing info
+                this.fireEvent('progress', progress, currentPos, index, this.currentBearing);
+            }
+        }
+
+        on(eventName, handler) {
+            this.eventHandlers[eventName] = handler;
+        }
+
+        fireEvent(eventName, ...args) {
+            if (this.eventHandlers[eventName]) {
+                this.eventHandlers[eventName](...args);
+            }
+        }
+
+        remove() {
+            this.pause();
+            if (this.marker) map.removeLayer(this.marker);
+            if (this.passedLine) map.removeLayer(this.passedLine);
+            if (this.fullLine) map.removeLayer(this.fullLine);
+        }
+
+        getIsPlaying() {
+            return this.isPlaying;
+        }
+    }
+
+    // Global variables
+    let track = null;
+    let trackData = [];
+
+    // DOM elements
+    const loadDataBtn = document.getElementById('loadDataBtn');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const speedRange = document.getElementById('speedRange');
+    const speedValue = document.getElementById('speedValue');
+    const progressRange = document.getElementById('progressRange');
+    const progressValue = document.getElementById('progressValue');
+    const statusDisplay = document.getElementById('statusDisplay');
+    const positionDisplay = document.getElementById('positionDisplay');
+    const headingDisplay = document.getElementById('headingDisplay');
+    const progressDisplay = document.getElementById('progressDisplay');
+    const indexDisplay = document.getElementById('indexDisplay');
+    const speedDisplay = document.getElementById('speedDisplay');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const errorMessage = document.getElementById('errorMessage');
+
+    // API configuration
+    const API_CONFIG = {
+        url: 'https://api.baliniot.in/api/history',
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6IkFwcCBkZW1vIiwicm9sZSI6IjEiLCJ1c2VyX2lkIjoiMjkiLCJwYXJlbnRfaWQiOiIyIiwidGltZV96b25lIjoiMDU6MzAiLCJuYmYiOjE3NTM3ODA3MzAsImV4cCI6MTc1NDM4NTUzMCwiaWF0IjoxNzUzNzgwNzMwfQ.F-pty6SpaL0qm1g3mGSVbtDvz-E2PYUOvSWGpIOxvvQ',
+            'Content-Type': 'application/json',
+        },
+        payload: {
+            "DeviceId": "7524",
+            "FromTime": "2025-07-29T00:00:00+05:30",
+            "ToTime": "2025-07-29T23:59:59+05:30"
+        }
+    };
+
+    // Function to create track player with rotation support
+    function createTrackPlayer(path, options) {
+        console.log('Creating custom TrackPlayer with rotation support');
+        const customPath = path.map(p => ({ lat: p.lat || p[0], lng: p.lng || p[1] }));
+        return new CustomTrackPlayer(customPath, options);
+    }
+
+    // Load track data from API
+    async function loadTrackData() {
+        try {
+            showLoading(true);
+            hideError();
+            updateStatus('Loading track data...');
+
+            const response = await fetch(API_CONFIG.url, {
+                method: 'POST',
+                headers: API_CONFIG.headers,
+                body: JSON.stringify(API_CONFIG.payload)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (!data.result || !data.data || data.data.length === 0) {
+                throw new Error('No tracking data found for the specified time range');
+            }
+
+            trackData = data.data;
+
+            // Convert API data to path format
+            const path = trackData.map(point => ({
+                lat: point.latitude,
+                lng: point.longitude
+            }));
+
+            // Remove existing track if any
+            if (track) {
+                track.remove();
+            }
+
+            // Fit map to bounds
+            const bounds = path.map(p => [p.lat, p.lng]);
+            map.fitBounds(bounds);
+
+            // Create track player with rotation
+            track = createTrackPlayer(path, {
+                markerIcon: L.icon({
+                    iconSize: [27, 54],
+                    iconUrl: "https://weijun-lab.github.io/Leaflet.TrackPlayer/lib/assets/car.png",
+                    iconAnchor: [13.5, 27],
+                    className: 'rotated-car-marker'
+                }),
+                speed: parseInt(speedRange.value) * 100,
+            });
+
+            track.addTo(map);
+            setupTrackEvents();
+            enableControls(true);
+            updateStatus(`Track loaded: ${trackData.length} points`);
+            updateDisplay();
+
+        } catch (error) {
+            console.error('Error loading track data:', error);
+            showError(`Failed to load track data: ${error.message}`);
+            updateStatus('Error loading data');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // Setup track event listeners
+    function setupTrackEvents() {
+        if (!track) return;
+
+        track.on("start", () => {
+            console.log("start");
+            updateStatus("Playback started");
+            updateButtonStates();
+        });
+
+        track.on("pause", () => {
+            console.log("pause");
+            updateStatus("Playback paused");
+            updateButtonStates();
+        });
+
+        track.on("finished", () => {
+            console.log("finished");
+            updateStatus("Playback finished");
+            updateButtonStates();
+        });
+
+        track.on("progress", (progress, position, index, bearing) => {
+            const lat = position.lat || position[0];
+            const lng = position.lng || position[1];
+
+            console.log(`progress:${progress} - position:${lng},${lat} - trackIndex:${index} - bearing:${bearing || 'calculated'}`);
+
+            positionDisplay.textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            headingDisplay.textContent = bearing ? `${Math.round(bearing)}°` : 'Calculating...';
+            progressDisplay.textContent = `${Math.round(progress * 100)}%`;
+            indexDisplay.textContent = `${index + 1}/${trackData.length}`;
+            progressRange.value = progress * 100;
+            progressValue.textContent = `${Math.round(progress * 100)}%`;
+
+            if (trackData[index]) {
+                speedDisplay.textContent = `${trackData[index].speed} km/h`;
+
+                // Also show API heading if available
+                if (trackData[index].heading !== undefined) {
+                    headingDisplay.textContent = `${trackData[index].heading}° (API) / ${bearing ? Math.round(bearing) : 'calc'}° (Calc)`;
+                }
+            }
+        });
+    }
+
+    // Update button states
+    function updateButtonStates() {
+        if (!track) return;
+
+        const isPlaying = track.getIsPlaying ? track.getIsPlaying() : track.isPlaying;
+
+        if (isPlaying) {
+            playPauseBtn.innerHTML = '⏸️ Pause';
+            playPauseBtn.classList.add('active');
+        } else {
+            playPauseBtn.innerHTML = '▶️ Play';
+            playPauseBtn.classList.remove('active');
+        }
+    }
+
+    // Utility functions
+    function showLoading(show) {
+        loadingIndicator.style.display = show ? 'block' : 'none';
+    }
+
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = 'block';
+        setTimeout(() => {
+            errorMessage.style.display = 'none';
+        }, 5000);
+    }
+
+    function hideError() {
+        errorMessage.style.display = 'none';
+    }
+
+    function updateStatus(message) {
+        statusDisplay.textContent = message;
+    }
+
+    function enableControls(enabled) {
+        playPauseBtn.disabled = !enabled;
+        resetBtn.disabled = !enabled;
+        speedRange.disabled = !enabled;
+        progressRange.disabled = !enabled;
+    }
+
+    function updateDisplay() {
+        indexDisplay.textContent = `0/${trackData.length}`;
+        progressDisplay.textContent = '0%';
+        progressRange.value = 0;
+        progressValue.textContent = '0%';
+        headingDisplay.textContent = '-';
+
+        if (trackData.length > 0) {
+            positionDisplay.textContent = `${trackData[0].latitude.toFixed(6)}, ${trackData[0].longitude.toFixed(6)}`;
+            speedDisplay.textContent = `${trackData[0].speed} km/h`;
+            if (trackData[0].heading !== undefined) {
+                headingDisplay.textContent = `${trackData[0].heading}°`;
+            }
+        }
+    }
+
+    // Event listeners
+    loadDataBtn.addEventListener('click', loadTrackData);
+
+    playPauseBtn.addEventListener('click', () => {
+        if (!track) return;
+
+        const isPlaying = track.getIsPlaying ? track.getIsPlaying() : track.isPlaying;
+
+        if (isPlaying) {
+            track.pause();
+        } else {
+            track.start();
+        }
+    });
+
+    resetBtn.addEventListener('click', () => {
+        if (track) {
+            if (track.setProgress) {
+                track.setProgress(0);
+            }
+            track.pause();
+            updateDisplay();
+            updateButtonStates();
+        }
+    });
+
+    speedRange.addEventListener('input', (e) => {
+        const speed = parseInt(e.target.value);
+        speedValue.textContent = `${speed}x`;
+        if (track && track.setSpeed) {
+            track.setSpeed(speed * 100);
+        }
+    });
+
+    progressRange.addEventListener('input', (e) => {
+        const progress = parseFloat(e.target.value);
+        progressValue.textContent = `${Math.round(progress)}%`;
+        if (track && track.setProgress) {
+            track.setProgress(progress / 100);
+        }
+    });
+
+    // Initialize displays
+    speedValue.textContent = `${speedRange.value}x`;
+    progressValue.textContent = `${progressRange.value}%`;
+</script>
+</body>
+</html>

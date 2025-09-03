@@ -1,0 +1,16 @@
+export interface OverSpeedReport {
+    fkDeviceId: number,
+    vehicleNo: string,
+    speedStartTime: string,
+    startLat: number,
+    startLng: number,
+    startSpeed: number,
+    startAddress: string,
+    speedEndTime: string,
+    endLat: number,
+    endLng: number,
+    endSpeed: number,
+    endAddress: string,
+    distance: number,
+    duration?:string,
+}

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1217.49 1126.75">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #79858e;
+      }
+
+      .cls-1, .cls-2, .cls-3, .cls-4 {
+        stroke-width: 0px;
+      }
+
+      .cls-2 {
+        fill: #000;
+      }
+
+      .cls-3 {
+        fill: #fec13b;
+      }
+
+      .cls-5 {
+        fill: #231f20;
+        font-family: OCRAExtended, 'OCR A Extended';
+        font-size: 72px;
+      }
+
+      .cls-4 {
+        fill: #fff;
+      }
+    </style>
+  </defs>
+  <line class="cls-4" x1="381.73" y1="384.02" x2="291.61" y2="298.03"/>
+  <polyline class="cls-2" points="112.76 175.74 199.43 90.29 321.88 90.29 403.74 175.74 403.74 294.42 318.44 378.51 200.12 378.51 110.01 293.74"/>
+  <polyline class="cls-3" points="125.8 182.51 204.49 105.42 315.66 105.42 389.98 182.51 389.98 289.58 312.54 365.44 205.12 365.44 123.31 288.97"/>
+  <rect class="cls-2" x="233.68" y="373.01" width="47.08" height="201.48"/>
+  <rect class="cls-1" x="248.66" y="381.11" width="15.29" height="179.01"/>
+  <text class="cls-5" transform="translate(168.82 253.95)"><tspan x="0" y="0">Idle</tspan></text>
+</svg>

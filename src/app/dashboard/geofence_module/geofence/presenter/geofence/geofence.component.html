@@ -1,0 +1,196 @@
+
+
+<div class="grid">
+  <div class="col-12 sm:col-12 md:col-5 lg:col-4">
+    <div class="card h-full">
+      <div
+        class="flex flex-column flex-wrap gap-3 align-items-center justify-content-between"
+      >
+        <input
+          #autocompleteInput
+          pInputText
+          class="w-full text-xl"
+          type="text"
+          id="autocomplete-input"
+          placeholder="Enter a location"
+        />
+
+        <input
+          pInputText
+          class="w-full text-xl"
+          type="text"
+          [(ngModel)]="geofenceName"
+          placeholder="Enter Geofence Name"
+        />
+
+        <button
+          pButton
+          type="button"
+          label="Update {{ geofenceType }} Geofence"
+          (click)="updateGeofence()"
+          class="w-full text-xl"
+          style="background-color: #1797b0"
+          *ngIf="toggleButton === true"
+        ></button>
+        <button
+          pButton
+          type="button"
+          label="Cancel "
+          (click)="cancel()"
+          class="w-full text-xl"
+          style="background-color: #1797b0"
+          *ngIf="toggleButton === true"
+        ></button>
+        <button
+          pButton
+          type="button"
+          label="Generate {{ geofenceType }} Geofence"
+          class="w-full text-xl"
+          style="background-color: #1797b0"
+          (click)="generateGeofence()"
+          *ngIf="toggleButton === false"
+        ></button>
+        <p-dropdown
+        autoWidth="false"
+        class="w-full"
+        [style]="{ width: '100%' }"
+        [options]="devices"
+        [filter]="true"
+        [resetFilterOnHide]="true"
+        optionLabel="name"
+        optionValue="code"
+        placeholder="Select a vehicle to view its linked geofences."
+        (onChange)="getGeofenceByDeviceId($event.value)"
+      ></p-dropdown>
+      <div class="flex w-12 gap-2">
+        <button
+          [disabled]="!(selectedGeofence !== undefined || null)"
+          pButton
+          class="w-full my-2 text-xl"
+          style="background-color: #1797b0"
+          type="button"
+          label="Link Geofence"
+          (click)="linkGeofence()"
+        >
+          <i class="pi pi-link mr-2"></i>
+        </button>
+
+        <button
+          [disabled]="!(selectedGeofence !== undefined || null)"
+          pButton
+          class="w-full my-2 text-xl"
+          style="background-color: #1797b0"
+          type="button"
+          label="Delete Geofence"
+          (click)="deleteGeofence()"
+        >
+          <i class="pi pi-trash mr-2"></i>
+        </button>
+      </div>
+      <div
+        class="gap-2 flex w-12 flex-column overflow-y-scroll"
+        style="height: 52vh"
+      >
+        <div
+          *ngFor="let item of geofences"
+          class="bg-gray-100 border-round-xl p-3"
+        >
+          <div class="flex flex-row justify-content-between align-items-center">
+            <div
+              class="flex gap-3 flex-row justify-content-between align-items-center"
+            >
+              <p-checkbox
+                [(ngModel)]="item.isSelected"
+                [binary]="true"
+                (onChange)="handleCheckboxChange(item)"
+              ></p-checkbox>
+              <span class="text-xl font-bold">{{ item.geometryName }}</span>
+              <span class="text-xl font-bold">{{
+                item.radius === 0
+                  ? " -- Polygon Geofence"
+                  : " -- Circular Geofence"
+              }}</span>
+            </div>
+            <div
+              class="flex gap-3 flex-row justify-content-between align-items-center"
+            >
+              <p-inputSwitch
+                *ngIf="selectDeviceID !== 0"
+                [(ngModel)]="item.isLinked"
+                (onChange)="
+                  toggleGeofenceLink(
+                    item.id,
+                    item.isLinked,
+                    item.mappingId ?? 0
+                  )
+                "
+              >
+              </p-inputSwitch>
+              <i
+                pTooltip="Show linked Devcies"
+                tooltipPosition="bottom"
+                class="pi pi-{{
+                  displayLinkedItems[item.id] ? 'angle-up' : 'angle-down'
+                }} font-bold"
+                style="font-size: 1.5rem"
+                (click)="toggleLinkedItems(item.id)"
+              >
+              </i>
+              <i
+                pTooltip="Show Geofence"
+                tooltipPosition="bottom"
+                (click)="loadGeofence(item.id)"
+                class="pi pi-angle-double-right font-bold"
+                style="font-size: 1.5rem"
+              >
+              </i>
+            </div>
+          </div>
+          <div
+            class="gap-2 flex flex-column"
+            *ngIf="displayLinkedItems[item.id]"
+          >
+            <ng-container
+              *ngIf="linkedDevices[item.id] !== undefined; else nodata"
+            >
+              <div
+                class="bg-gray-300 border-round-xl p-2 mt-2 flex flex-row justify-content-between align-items-center"
+                *ngFor="let linkedItem of linkedDevices[item.id]"
+              >
+                <div class="text-xl font-bold">{{ linkedItem.name }}</div>
+                <div class="text-xl font-bold">
+                  {{ linkedItem.geometryName }}
+                </div>
+              </div>
+            </ng-container>
+            <ng-template #nodata>
+              <div
+                class="mt-2 bg-gray-300 border-round-xl p-2 flex flex-row justify-content-between align-items-center"
+              >
+                No Geofence is Linked Yet
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+      </div>
+
+   
+
+      
+    </div>
+  </div>
+  <div class="col-12 sm:col-12 md:col-7 lg:col-8">
+    <div class="card relative">
+      <div class="speeddial-tooltip-demo">
+        <p-speedDial
+          [model]="items"
+          className="speeddial-right"
+          direction="up"
+        />
+      </div>
+
+      <div id="geofenceMap" style="height: 80vh"></div>
+    </div>
+  </div>
+</div>

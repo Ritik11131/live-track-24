@@ -1,0 +1,69 @@
+/* You can add global styles to this file, and also import other style files */
+$gutter: 1rem; //for primeflex grid system
+
+/* Layout */
+@import "assets/layout/styles/layout/layout.scss";
+
+
+// angular material
+@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+
+/* PrimeNG */
+@import "../node_modules/primeng/resources/primeng.min.css";
+@import "../node_modules/primeflex/primeflex.scss";
+@import "../node_modules/primeicons/primeicons.css";
+
+/* Quill Text Editor for p-editor */
+@import "../node_modules/quill/dist/quill.core.css";
+@import "../node_modules/quill/dist/quill.snow.css";
+
+/* Demos */
+@import "assets/demo/styles/flags/flags.css";
+@import "assets/demo/styles/badges.scss";
+@import "assets/demo/styles/code.scss";
+
+
+// this css is added to remove the background of the icons of the vehicles which is coming from the leaflet css 
+
+.leaflet-div-icon {
+	background: #00000000 !important;
+	border: 1px solid #00000000  !important;
+}
+.p-galleria-thumbnail-container {
+	display: none;
+}
+
+
+.p-tabmenu .p-tabmenu-nav{
+	background-color: transparent;
+}
+.p-tabmenu .p-tabmenu-nav .p-tabmenuitem .p-menuitem-link{
+	background-color: transparent;
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+// tabs in vehiclde detail page
+.p-tabmenu .p-tabmenu-nav .p-tabmenuitem .p-menuitem-link {
+	font-size: 12px;
+}
+.pi{
+	font-size: 12px;
+}
+//   for tabs in vehicle history
+.p-tabview .p-tabview-nav li .p-tabview-nav-link {
+	font-size: 12px;
+}
+//   for change password field
+.p-dialog .p-dialog-header .p-dialog-title {
+	font-weight: bold;
+	font-size: 13px;
+}
+//to increase the height of the slider in the geofence
+.p-slider.p-slider-horizontal{
+	height:0.5rem;
+}
+.p-multiselect{
+	width: 100%;
+   }

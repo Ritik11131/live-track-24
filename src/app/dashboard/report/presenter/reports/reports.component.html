@@ -1,0 +1,596 @@
+<div
+  class="fixed top-0 left-0 h-screen w-screen flex justify-content-center align-items-center"
+  style="z-index: 99999; background-color: rgba(0, 0, 0, 0.6)"
+  *ngIf="
+    distanceReportLoading ||
+    idleReportLoading ||
+    reportdownloading ||
+    stopReportLoading ||
+    overSpeedReportLoading ||
+    tripReportLoading ||
+    socReportLoading ||
+    temperatureReportLoading ||
+    detailReportLoading ||
+    totalDistanceReportLoading
+  "
+>
+  <p-progressSpinner></p-progressSpinner>
+</div>
+<div class="grid">
+  <div
+    [ngClass]="
+      fullDisplay ? 'hidden  ' : ' col-12 sm:col-12 md:col-5 lg:col-4 xl:col-3'
+    "
+  >
+    <div class="card" style="height: 75vh">
+      <div
+        class="flex flex-column flex-wrap gap-2 align-items-center justify-content-between"
+      >
+        <p-dropdown
+          class="w-full"
+          [style]="{ width: '100%' }"
+          [options]="reports"
+          optionLabel="name"
+          placeholder="Select a Report Type"
+          (onChange)="onDropdownChange($event)"
+        ></p-dropdown>
+
+        <p-dropdown
+          *ngIf="selectedReport !== 'TDS'"
+          autoWidth="false"
+          class="w-full"
+          [style]="{ width: '100%' }"
+          [options]="devices"
+          [filter]="true"
+          [filterBy]="selectedReportName"
+          [resetFilterOnHide]="true"
+          optionLabel="name"
+          (onChange)="onDropdownChange1($event)"
+          placeholder="Select Vehicle"
+        ></p-dropdown>
+
+        <p-multiSelect
+          *ngIf="selectedReport === 'TDS'"
+          [options]="devices"
+          placeholder="Select User"
+          optionLabel="name"
+          optionValue="code"
+          display="chip"
+          class="w-full"
+          [(ngModel)]="selectedVehicle"
+          [showClear]="true"
+        ></p-multiSelect>
+        <input
+          class="w-full text-xl"
+          pInputText
+          type="text"
+          (input)="onInput($event)"
+          *ngIf="selectedReport === 'OS'"
+          placeholder="Select OverSpeed Limit"
+          [(ngModel)]="overSpeedLimit"
+        />
+        <input
+          class="w-full text-xl"
+          pInputText
+          type="text"
+          (input)="onInput($event)"
+          *ngIf="selectedReport === 'DETAIL'"
+          placeholder="Select Timespan"
+          [(ngModel)]="timeSpan"
+        />
+        <input
+          class="w-full text-xl"
+          pInputText
+          (click)="openDateComponent()"
+          placeholder="Select Date"
+          [(ngModel)]="dateRange"
+        />
+
+        <button
+          pButton
+          class="w-full text-xl"
+          label="Generate"
+          style="background-color: #1797b0"
+          (click)="getReport(selectedReportName)"
+        ></button>
+        <div class="flex flex-row gap-2 w-full">
+          <button
+            pButton
+            class="w-full text-xl"
+            label="Pdf"
+            icon="pi pi-cloud-download"
+            [style]="{
+              'background-color': 'white',
+              'border-color': '#4C63B6',
+              color: '#4C63B6'
+            }"
+            (click)="exportToPdf(selectedReportName)"
+            [disabled]="isDataAvailable()"
+          ></button>
+
+          <button
+            pButton
+            class="w-full text-xl"
+            label="Excel"
+            icon="pi pi-cloud-download"
+            [style]="{
+              'background-color': 'white',
+              'border-color': '#4C63B6',
+              color: '#4C63B6'
+            }"
+            (click)="exportToExcel(selectedReportName)"
+            [disabled]="isDataAvailable()"
+          ></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    [ngClass]="
+      fullDisplay ? 'col-12 ' : ' col-12 sm:col-12 md:col-7 lg:col-8 xl:col-9'
+    "
+  >
+    <div class="card" style="height: 75vh">
+      <p-table
+        #dt
+        id="reportTable"
+        [paginator]="true"
+        [rows]="10"
+        [value]="distanceReport"
+        [value]="stopReport"
+        [value]="idleReport"
+        [value]="tripReport"
+        [value]="overspeedReport"
+        [value]="socReport"
+        [value]="temperatureReport"
+        [value]="detailReport"
+        [value]="totalDistanceReport"
+        [scrollable]="true"
+        styleClass="p-datatable-gridlines" 
+
+        scrollHeight="55vh"
+        (onPage)="onPageChange($event)"
+        [showCurrentPageReport]="true"
+        responsiveLayout="scroll"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [globalFilterFields]="['timestamp']"
+      >
+        <ng-template pTemplate="caption">
+          <div class="flex align-items-center gap-2">
+            <!-- <button (click)="toggleArrow()" pButton class=" justify-content-center border-circle align-items-center" style="padding:5px">
+          <i  [ngClass]="fullDisplay ? 'pi pi-arrow-right' : 'pi pi-arrow-left'" ></i>
+         </button> -->
+            <h3 class="m-0 font-semibold">
+              {{ selectedReportName }}
+              <span *ngIf="selectedReport === 'DR' && totalDistance !== 0"
+                >({{ totalDistance.toFixed(2) }}km)</span
+              >
+            </h3>
+            <!-- <span
+         class="p-input-icon-left ml-2 w-full sm:w-20rem flex-order-1 sm:flex-order-0"
+       >
+         <i class="pi pi-search"></i>
+         <input
+           pInputText
+           type="text"
+           (input)="onDropDownGlobalFilter(dt, $event)"
+           placeholder="Search"
+           class="w-full"
+         />
+       </span> -->
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr class="text-2xl" *ngIf="selectedReport === 'DR'">
+            <th pSortableColumn="date" class="white-space-nowrap">
+              Date <p-sortIcon field="date"></p-sortIcon>
+            </th>
+            <th pSortableColumn="distance" class="white-space-nowrap">
+              Distance <p-sortIcon field="distance"></p-sortIcon>
+            </th>
+            <th pSortableColumn="startAddress" class="white-space-nowrap">
+              Start Address <p-sortIcon field="startAddress"></p-sortIcon>
+            </th>
+            <th pSortableColumn="endAddress" class="white-space-nowrap">
+              End Address <p-sortIcon field="endAddress"></p-sortIcon>
+            </th>
+          </tr>
+          <tr class="text-2xl" *ngIf="selectedReport === 'TR'">
+            <th pSortableColumn="startTime" class="white-space-nowrap">
+              Start Time<p-sortIcon field="startTime"></p-sortIcon>
+            </th>
+            <th pSortableColumn="startAddress" class="white-space-nowrap">
+              Start Location <p-sortIcon field="startLocation"></p-sortIcon>
+            </th>
+            <th pSortableColumn="endTime" class="white-space-nowrap">
+              End Time<p-sortIcon field="endTime"></p-sortIcon>
+            </th>
+            <th pSortableColumn="endAddress" class="white-space-nowrap">
+              End Location<p-sortIcon field="endLocation"></p-sortIcon>
+            </th>
+            <th pSortableColumn="distance" class="white-space-nowrap">
+              Distance<p-sortIcon field="distance"></p-sortIcon>
+            </th>
+            <th pSortableColumn="duration" class="white-space-nowrap">
+              Duration<p-sortIcon field="duration"></p-sortIcon>
+            </th>
+          </tr>
+          <tr class="text-2xl" *ngIf="selectedReport === 'SR'">
+            <th pSortableColumn="startTime" class="white-space-nowrap">
+              Start Time<p-sortIcon field="startTime"></p-sortIcon>
+            </th>
+            <th pSortableColumn="endTime" class="white-space-nowrap">
+              End Time<p-sortIcon field="endTime"></p-sortIcon>
+            </th>
+            <th pSortableColumn="duration" class="white-space-nowrap">
+              Duration<p-sortIcon field="duration"></p-sortIcon>
+            </th>
+            <th pSortableColumn="location" class="white-space-nowrap">
+              Location<p-sortIcon field="location"></p-sortIcon>
+            </th>
+          </tr>
+          <tr class="text-2xl" *ngIf="selectedReport === 'IR'">
+            <th pSortableColumn="startTime" class="white-space-nowrap">
+              Start Time<p-sortIcon field="startTime"></p-sortIcon>
+            </th>
+            <th pSortableColumn="endTime" class="white-space-nowrap">
+              End Time<p-sortIcon field="endTime"></p-sortIcon>
+            </th>
+            <th pSortableColumn="duration" class="white-space-nowrap">
+              Duration<p-sortIcon field="duration"></p-sortIcon>
+            </th>
+            <th pSortableColumn="location" class="white-space-nowrap">
+              Location<p-sortIcon field="location"></p-sortIcon>
+            </th>
+          </tr>
+          <tr class="text-2xl" *ngIf="selectedReport === 'OS'">
+            <th pSortableColumn="speedStartTime" class="white-space-nowrap">
+              Speed Start Time<p-sortIcon field="speedStartTime"></p-sortIcon>
+            </th>
+            <th pSortableColumn="startAddress" class="white-space-nowrap">
+              Start Address<p-sortIcon field="startAddress"></p-sortIcon>
+            </th>
+            <th pSortableColumn="speedEndTime" class="white-space-nowrap">
+              Speed End Time<p-sortIcon field="speedEndTime"></p-sortIcon>
+            </th>
+            <th pSortableColumn="endAddress" class="white-space-nowrap">
+              End Address<p-sortIcon field="endAddress"></p-sortIcon>
+            </th>
+            <th pSortableColumn="startSpeed" class="white-space-nowrap">
+              Start Speed<p-sortIcon field="startSpeed"></p-sortIcon>
+            </th>
+            <th pSortableColumn="endSpeed" class="white-space-nowrap">
+              End Speed<p-sortIcon field="endSpeed"></p-sortIcon>
+            </th>
+            <th pSortableColumn="distance" class="white-space-nowrap">
+              Distance<p-sortIcon field="distance"></p-sortIcon>
+            </th>
+            <th pSortableColumn="duration" class="white-space-nowrap">
+              Duration<p-sortIcon field="duration"></p-sortIcon>
+            </th>
+          </tr>
+          <tr class="text-2xl" *ngIf="selectedReport === 'SOC'">
+            <th pSortableColumn="bmsSoc" class="white-space-nowrap">
+              SOC Value<p-sortIcon field="bmsSoc"></p-sortIcon>
+            </th>
+            <th pSortableColumn="timestamp" class="white-space-nowrap">
+              Date-Time <p-sortIcon field="timestamp"></p-sortIcon>
+            </th>
+            <th pSortableColumn="address" class="white-space-nowrap">
+              Location <p-sortIcon field="address"></p-sortIcon>
+            </th>
+          </tr>
+          <tr class="text-2xl" *ngIf="selectedReport === 'TEMP'">
+            <th pSortableColumn="temp" class="white-space-nowrap">
+              Temperature Value<p-sortIcon field="temp"></p-sortIcon>
+            </th>
+            <th pSortableColumn="timestamp" class="white-space-nowrap">
+              Date-Time <p-sortIcon field="timestamp"></p-sortIcon>
+            </th>
+            <th pSortableColumn="address" class="white-space-nowrap">
+              Location <p-sortIcon field="address"></p-sortIcon>
+            </th>
+          </tr>
+          <tr class="text-2xl" *ngIf="selectedReport === 'DETAIL'">
+            <th pSortableColumn="timestamp" class="white-space-nowrap">
+              Date-Time <p-sortIcon field="timestamp"></p-sortIcon>
+            </th>
+            <th pSortableColumn="ignstatus" class="white-space-nowrap">
+              Ignition Status <p-sortIcon field="ignstatus"></p-sortIcon>
+            </th>
+            <th pSortableColumn="speed" class="white-space-nowrap">
+              Speed <p-sortIcon field="speed"></p-sortIcon>
+            </th>
+            <th pSortableColumn="latlng" class="white-space-nowrap">
+              Lat Lng <p-sortIcon field="latlng"></p-sortIcon>
+            </th>
+            <th
+              *ngIf="hasProperty('ac')"
+              pSortableColumn="ac"
+              class="white-space-nowrap"
+            >
+              AC <p-sortIcon field="ac"></p-sortIcon>
+            </th>
+            <th
+              *ngIf="hasProperty('door')"
+              pSortableColumn="door"
+              class="white-space-nowrap"
+            >
+              Door <p-sortIcon field="door"></p-sortIcon>
+            </th>
+            <th
+              *ngIf="hasProperty('extVolt')"
+              pSortableColumn="extVolt"
+              class="white-space-nowrap"
+            >
+              Ext-Volt <p-sortIcon field="extVolt"></p-sortIcon>
+            </th>
+
+            <th pSortableColumn="address" class="white-space-nowrap">
+              Address<p-sortIcon field="address"></p-sortIcon>
+            </th>
+          </tr>
+
+          <tr class="text-2xl" *ngIf="selectedReport === 'TDS'">
+            <th pSortableColumn="vehicleNo" class="white-space-nowrap">
+              Vehicle Number <p-sortIcon field="vehicleNo"></p-sortIcon>
+            </th>
+            <th pSortableColumn="firstDate" class="white-space-nowrap">
+              Start Date <p-sortIcon field="firstDate"></p-sortIcon>
+            </th>
+            <th pSortableColumn="lastDate" class="white-space-nowrap">
+              End Date <p-sortIcon field="lastDate"></p-sortIcon>
+            </th>
+            <th pSortableColumn="totalDistance" class="white-space-nowrap">
+              Total Distance <p-sortIcon field="totalDistance"></p-sortIcon>
+            </th>
+          </tr>
+        </ng-template>
+
+        <ng-template
+          pTemplate="body"
+          let-distanceReport
+          let-stopReport
+          let-idleReport
+          let-tripReport
+          let-overspeedReport
+          let-socReport
+          let-temperatureReport
+          let-detailReport
+          let-totalDistanceReport
+        >
+          <tr class="text-xl" *ngIf="selectedReport === 'DR'">
+            <ng-container
+              *ngIf="distanceReportLoading; else distanceReportData"
+            >
+              <!-- Skeleton loading UI -->
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+            </ng-container>
+            <ng-template #distanceReportData>
+              <!-- Actual data -->
+              <td>{{ distanceReport.dateDis }}</td>
+              <td>
+                {{
+                  distanceReport.distance === null ? 0 : distanceReport.distance
+                }}
+                Km
+              </td>
+              <td>{{ distanceReport.startAddress }}</td>
+              <td>{{ distanceReport.endAddress }}</td>
+            </ng-template>
+          </tr>
+          <tr class="text-xl" *ngIf="selectedReport === 'TR'">
+            <ng-container *ngIf="tripReportLoading; else tripReportData">
+              <!-- Skeleton loading UI -->
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+            </ng-container>
+            <ng-template #tripReportData>
+              <!-- Actual data -->
+              <td>{{ tripReport.tripStartTime }}</td>
+              <td>{{ tripReport.startAddress }}</td>
+              <td>{{ tripReport.tripEndTime }}</td>
+              <td>{{ tripReport.endAddress }}</td>
+              <td>
+                {{ tripReport.distance === null ? 0 : tripReport.distance }} Km
+              </td>
+              <td>{{ tripReport.duration }}</td>
+            </ng-template>
+          </tr>
+          <tr class="text-xl" *ngIf="selectedReport === 'SR'">
+            <ng-container *ngIf="stopReportLoading; else stopReportData">
+              <!-- Skeleton loading UI -->
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+            </ng-container>
+            <ng-template #stopReportData>
+              <!-- Actual data -->
+              <td>{{ stopReport.dormantStart }}</td>
+              <td>{{ stopReport.dormantEnd }}</td>
+              <td>{{ stopReport.duration }}</td>
+              <td>{{ stopReport.address }}</td>
+            </ng-template>
+          </tr>
+          <tr class="text-xl" *ngIf="selectedReport === 'IR'">
+            <ng-container *ngIf="idleReportLoading; else idleReportData">
+              <!-- Skeleton loading UI -->
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+            </ng-container>
+            <ng-template #idleReportData>
+              <!-- Actual data -->
+              <td>{{ idleReport.dormantStart }}</td>
+              <td>{{ idleReport.dormantEnd }}</td>
+              <td>{{ idleReport.duration }}</td>
+              <td>{{ idleReport.address }}</td>
+            </ng-template>
+          </tr>
+          <tr class="text-xl" *ngIf="selectedReport === 'OS'">
+            <ng-container
+              *ngIf="overSpeedReportLoading; else overspeedReportData"
+            >
+              <!-- Skeleton loading UI -->
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+            </ng-container>
+            <ng-template #overspeedReportData>
+              <!-- Actual data -->
+              <td>{{ overspeedReport.speedStartTime }}</td>
+              <td>{{ overspeedReport.startAddress }}</td>
+              <td>{{ overspeedReport.speedEndTime }}</td>
+              <td>{{ overspeedReport.endAddress }}</td>
+              <td>{{ overspeedReport.startSpeed }}km/hr</td>
+              <td>{{ overspeedReport.endSpeed }} Km/hr</td>
+              <td>
+                {{
+                  overspeedReport.distance === null
+                    ? 0
+                    : overspeedReport.distance
+                }}
+                Km
+              </td>
+              <td>{{ overspeedReport.duration }}</td>
+            </ng-template>
+          </tr>
+          <tr class="text-xl" *ngIf="selectedReport === 'SOC'">
+            <ng-container *ngIf="socReportLoading; else socReportData">
+              <!-- Skeleton loading UI -->
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+            </ng-container>
+            <ng-template #socReportData>
+              <!-- Actual data -->
+              <td>{{ socReport.bmsSOC }}</td>
+              <td>{{ socReport.timestamp }}</td>
+              <td>
+                <a
+                  style="
+                    color: blue;
+                    text-decoration: underline;
+                    cursor: pointer;
+                  "
+                  (click)="openMap(socReport.latlng.lat, socReport.latlng.lng)"
+                  >{{ socReport.latlng.lat }},{{ socReport.latlng.lng }}
+                </a>
+              </td>
+            </ng-template>
+          </tr>
+          <tr class="text-xl" *ngIf="selectedReport === 'TEMP'">
+            <ng-container *ngIf="temperatureReportLoading; else tempReportData">
+              <!-- Skeleton loading UI -->
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+            </ng-container>
+            <ng-template #tempReportData>
+              <!-- Actual data -->
+              <td>{{ temperatureReport.temp }}</td>
+              <td>{{ temperatureReport.timestamp }}</td>
+              <td>
+                <a
+                  style="
+                    color: blue;
+                    text-decoration: underline;
+                    cursor: pointer;
+                  "
+                  (click)="
+                    openMap(
+                      temperatureReport.latlng.lat,
+                      temperatureReport.latlng.lng
+                    )
+                  "
+                  >{{ temperatureReport.latlng.lat }},{{
+                    temperatureReport.latlng.lng
+                  }}
+                </a>
+              </td>
+            </ng-template>
+          </tr>
+          <tr class="text-xl" *ngIf="selectedReport === 'DETAIL'">
+            <ng-container *ngIf="detailReportLoading; else detailReportData">
+              <!-- Skeleton loading UI -->
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+            </ng-container>
+            <ng-template #detailReportData>
+              <!-- Actual data -->
+              <td class="white-space-nowrap">{{ detailReport.timestamp }}</td>
+              <td>{{ detailReport.ignstatus === true ? "On" : "Off" }}</td>
+              <td>{{ detailReport.speed }}km/hr</td>
+              <td>
+                {{ detailReport.latlng.lat }},{{ detailReport.latlng.lng }}
+              </td>
+              <td *ngIf="detailReport.ac !== undefined">
+                {{ detailReport.ac === true ? "On" : "Off" }}
+              </td>
+
+              <td *ngIf="detailReport.door !== undefined">
+                {{ detailReport.door === true ? "Open" : "Closed" }}
+              </td>
+
+              <td *ngIf="detailReport.extVolt !== undefined">
+                {{ detailReport.extVolt }}V
+              </td>
+
+              <td>{{ detailReport.address }}</td>
+            </ng-template>
+          </tr>
+
+          <tr class="text-xl" *ngIf="selectedReport === 'TDS'">
+            <ng-container
+              *ngIf="totalDistanceReportLoading; else totalDistanceReportData"
+            >
+              <!-- Skeleton loading UI -->
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+              <td><p-skeleton></p-skeleton></td>
+            </ng-container>
+            <ng-template #totalDistanceReportData>
+              <!-- Actual data -->
+              <td>{{ totalDistanceReport.vehicleNo }}</td>
+              <td>{{ totalDistanceReport.firstDate }}</td>
+              <td>{{ totalDistanceReport.lastDate }}</td>
+              <td>{{ totalDistanceReport.totalDistance.toFixed(3) }} Km</td>
+            </ng-template>
+          </tr>
+          <tr class="text-xl" *ngIf="selectedReport === 'AC'">
+            <td>Coming Soon</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6"></td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<app-date-picker *ngIf="dateComponent"></app-date-picker>
+<p-toast></p-toast>

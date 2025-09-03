@@ -1,0 +1,287 @@
+<div class="card">
+  <h3 class="m-0 font-semibold">User List</h3>
+  <p-table
+    #dt
+    [value]="users"
+    [paginator]="true"
+    [rows]="10"
+    dataKey="id"
+    rowExpandMode="single"
+    [showCurrentPageReport]="true"
+    responsiveLayout="scroll"
+    [scrollable]="true"
+    scrollHeight="65vh"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [globalFilterFields]="['userName', 'loginId', 'email', 'mobileNo']"
+  >
+    <ng-template pTemplate="caption">
+      <div
+        class="flex flex-wrap gap-2 align-items-center justify-content-between"
+      >
+        <span>
+          <span
+            class="p-input-icon-left ml-2 w-full sm:w-20rem flex-order-1 sm:flex-order-0"
+          >
+            <i class="pi pi-search"></i>
+            <input
+              pInputText
+              type="text"
+              (input)="onGlobalFilter(dt, $event)"
+              placeholder="Search"
+              class="w-full text-xl"
+              />
+          </span>
+        </span>
+
+        <button
+          (click)="navigateToCreateUser()"
+          pButton
+          class="p-button-outlined w-full text-xl sm:w-auto flex-order-0 sm:flex-order-1"
+          icon="pi pi-user-plus"
+          label="{{ buttonText }}"
+        ></button>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr class="text-2xl">
+        <th pSortableColumn="userName" class="white-space-nowrap">
+          User Name
+          <p-sortIcon field="userName"></p-sortIcon>
+        </th>
+        <th pSortableColumn="loginId" class="white-space-nowrap">
+          Login Id
+          <p-sortIcon field="loginId"></p-sortIcon>
+        </th>
+        <th pSortableColumn="email" class="white-space-nowrap">
+          Email
+          <p-sortIcon field="email"></p-sortIcon>
+        </th>
+        <th pSortableColumn="mobileNo" class="white-space-nowrap">
+          Mobile No
+          <p-sortIcon field="mobileNo"></p-sortIcon>
+        </th>
+        <th pSortableColumn="userType" class="white-space-nowrap">
+          User Type
+          <p-sortIcon field="userType"></p-sortIcon>
+        </th>
+        <th  style="padding-left: 90px;"  pFrozenColumn
+        [frozen]="true"
+        alignFrozen="right">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-rowUser let-expanded="expanded">
+      <tr  class="text-xl">
+
+
+
+
+        <ng-container *ngIf="userData; else userinfo">
+          <!-- Skeleton loading UI -->
+          <td><p-skeleton></p-skeleton></td>
+          <td><p-skeleton></p-skeleton></td>
+          <td><p-skeleton></p-skeleton></td>
+          <td><p-skeleton></p-skeleton></td>
+          <td><p-skeleton></p-skeleton></td>
+          <td><p-skeleton></p-skeleton></td>
+        </ng-container>
+        <ng-template #userinfo>
+          <!-- Actual data -->
+          <td>{{ rowUser.userName }}</td>
+          <td>{{ rowUser.loginId }}</td>
+          <td>{{ rowUser.email }}</td>
+          <td>{{ rowUser.mobileNo }}</td>
+          <td>{{ userService.getUserTypeLabel(rowUser.userType) }}</td>
+          <td style="min-width: 225px;"    pFrozenColumn
+           [frozen]="true"
+           alignFrozen="right">
+            <button
+              pButton
+              pRipple
+              pTooltip="Edit user"
+              tooltipPosition="bottom"
+              type="button"
+              class="p-button-rounded p-button-text"
+              style="font-size: 1.5rem"
+              (click)="navigateToUpdateUser(rowUser)"
+            >
+              <i class="pi pi-user-edit" style="font-size: 1.5rem"></i>
+            </button>
+            <button
+              pButton
+              pRipple
+              pTooltip="Show/Change Password"
+              tooltipPosition="bottom"
+              type="button"
+              class="p-button-rounded p-button-text"
+              (click)="showPassword(rowUser)"
+            >
+              <i class="pi pi-eye" style="font-size: 1.5rem"></i>
+            </button>
+  
+<!--            <button-->
+<!--              pButton-->
+<!--              pRipple-->
+<!--              type="button"-->
+<!--              pTooltip="Delete user"-->
+<!--              tooltipPosition="bottom"-->
+<!--              class="p-button-rounded p-button-text"-->
+<!--              (click)="openDialog(rowUser)"-->
+<!--            >-->
+<!--              <i class="pi pi-trash" style="font-size: 1.5rem"></i>-->
+<!--            </button>-->
+            <button
+              pButton
+              pRipple
+              pTooltip="Linked Device"
+              tooltipPosition="bottom"
+              type="button"
+              [pRowToggler]="rowUser"
+              class="p-button-rounded p-button-text"
+              (click)="toggleRow(rowUser.id); $event.stopPropagation()"
+            >
+              <i class="pi pi-car" style="font-size: 1.5rem"></i>
+            </button>
+
+
+
+            <button
+            pButton
+            pRipple
+            type="button"
+            pTooltip="Login User"
+            tooltipPosition="bottom"
+            class="p-button-rounded p-button-text"
+            (click)="login(rowUser)"
+          >
+            <i class="pi pi-sign-in" style="font-size: 1.5rem"></i>
+          </button>
+          </td>
+        </ng-template>
+
+
+
+
+
+
+
+
+
+   
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="rowexpansion" let-rowUser>
+      <tr class="bg-gray-100 ">
+        <td colspan="12">
+          <div class="p-3">
+            <p-table
+              #dt1
+              [value]="devices[rowUser.id]"
+              [paginator]="true"
+              [rows]="10"
+              datakey="id"
+              [showCurrentPageReport]="true"
+              responsiveLayout="scroll"
+              currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+              [rowsPerPageOptions]="[10, 25, 50]"
+              [globalFilterFields]="[
+                'vehicleNo',
+                'deviceId',
+                'deviceImei',
+                'simPhoneNumber'
+              ]"
+            >
+              <ng-template pTemplate="caption">
+                <div
+                  class="flex flex-wrap gap-2 align-items-center justify-content-end"
+                >
+                  <span
+                    class="p-input-icon-left ml-2 w-full sm:w-20rem flex-order-1 sm:flex-order-0"
+                  >
+                    <i class="pi pi-search"></i>
+                    <input
+                      pInputText
+                      type="text"
+                      (input)="onDropDownGlobalFilter(dt1, $event)"
+                      placeholder="Search"
+                      class="w-full text-xl"
+                    />
+                  </span>
+                </div>
+              </ng-template>
+              <ng-template pTemplate="header">
+                <tr class="text-2xl">
+                  <th pSortableColumn="vehicleNo" class="white-space-nowrap">
+                    Vehicle Number
+                    <p-sortIcon field="vehicleNo"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="deviceId" class="white-space-nowrap">
+                    DeviceId
+                    <p-sortIcon field="deviceId"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="deviceImei" class="white-space-nowrap">
+                    Device Imei
+                    <p-sortIcon field="deviceImei"></p-sortIcon>
+                  </th>
+                  <th
+                    pSortableColumn="simPhoneNumber"
+                    class="white-space-nowrap"
+                  >
+                    Sim Phone Number
+                    <p-sortIcon field="simPhoneNumber"></p-sortIcon>
+                  </th>
+                  <th>Actions</th>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="body" let-device>
+                <tr class="text-xl">
+
+
+
+
+                  <ng-container *ngIf="deviceData; else deviceinfo">
+                    <!-- Skeleton loading UI -->
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                  </ng-container>
+                  <ng-template #deviceinfo>
+                    <!-- Actual data -->
+                    <td>{{ device.vehicleNo }}</td>
+                    <td>{{ device.deviceId }}</td>
+                    <td>{{ device.deviceImei }}</td>
+                    <td>{{ device.simPhoneNumber }}</td>
+                    <td>
+                      <button
+                        pButton
+                        pRipple
+                        pTooltip="edit device"
+                        tooltipPosition="bottom"
+                        (click)="navigateToUpdateDevice(device.id)"
+                        type="button"
+                        class="p-button-rounded p-button-text"
+                      >
+                        <i class="pi pi-pencil" style="font-size: 1.3rem"></i>
+                      </button>
+                    </td>
+                  </ng-template>
+
+
+
+                  
+                 
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>

@@ -1,0 +1,448 @@
+<div
+        class="fixed top-0 left-0 h-screen w-screen flex justify-content-center align-items-center"
+        style="z-index: 99999; background-color: rgba(0, 0, 0, 0.6)"
+        *ngIf="dataLoading"
+>
+    <p-progressSpinner></p-progressSpinner>
+</div>
+
+<div
+        *ngIf="linkExpired"
+        class="fixed top-0 left-0 h-screen w-screen flex justify-content-center align-items-center"
+        style="z-index: 99999; background-color: rgba(0, 0, 0, 0.6)"
+>
+    <div
+            class="card flex flex-row justify-content-between gap-5 mx-4 container1 w-8 bg-gray-200"
+    >
+        <div class="container2">
+            <img
+                    class="w-full h-full"
+                    src="/assets/demo/images/share_track/link_expire.png"
+            />
+        </div>
+        <div
+                class="container3 flex flex-column justify-content-center align-items-center text-"
+        >
+            <img
+                    class="w-full"
+                    src="/assets/demo/images/share_track/share_link_bg.png"
+            />
+            <h2 class="p-0 m-0 font-bold">Your Link has Expired</h2>
+        </div>
+    </div>
+</div>
+<div class="grid m-0">
+    <div *ngIf="data" class="col-12 sm:col-12 md:col-5 lg:col-5 xl:col-4">
+        <div  class=" h-full p-0">
+            <div   class=" card flex justify-content-between">        <h5 class="font-bold" style="font-size: 14px">
+                {{ data?.device?.vehicleNo }}
+            </h5>
+                <button
+                        class="toggle-button"
+                        pButton
+                        label="Toggle Details"
+                        icon="pi pi-info-circle"
+                        (click)="showDetails = !showDetails"
+                ></button>
+            </div>
+
+            <div [ngClass]="{'details-container': true, 'show': showDetails, 'hide': !showDetails}" class="card">
+
+                <div class="grid">
+                    <div class="col-6 flex flex-row">
+                        <i class="icon-style pi pi-sync"></i>
+                        <div class="flex flex-column align-items-start ml-2">
+                            <div *ngIf="data && data.position" class="text-sm">
+                                {{ data?.position?.servertime }}
+                            </div>
+                            <div class="text-sm">Last Updated</div>
+                        </div>
+                    </div>
+                    <div class="col-6 flex flex-row">
+                        <i class="icon-style pi pi-book"></i>
+                        <div class="flex flex-column align-items-start ml-2">
+                            <div *ngIf="data && data.position" class="text-sm">
+                                {{ data?.position?.status.duration }}
+                            </div>
+                            <div class="text-sm">Last Status</div>
+                        </div>
+                    </div>
+                    <div class="col-4 flex flex-row">
+                        <i class="icon-style pi pi-power-off"></i>
+                        <div class="flex flex-column align-items-start ml-2">
+                            <div *ngIf="data && data.position" class="text-sm">
+                                {{ data?.position?.details.ign === true ? "On" : "off" }}
+                            </div>
+                            <div class="text-sm">Ignition</div>
+                        </div>
+                    </div>
+                    <ng-container *ngIf="data && data.validity">
+                        <div
+                                *ngIf="convertData(data.validity.nextRechargeDate) <= 30"
+                                class="col-4 flex flex-row"
+                        >
+                            <i class="icon-style pi pi-clock"></i>
+                            <div class="flex flex-column align-items-start ml-2">
+                                <div *ngIf="data && data.validity" class="text-sm">
+                                    {{ data.validity.nextRechargeDate }}
+                                </div>
+                                <div class="text-sm">Expires In</div>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+
+                <div class="flex justify-content-between align-items-center">
+                    <div class="flex flex-row justify-content-between">
+                        <i class="icon-style pi pi-map-marker"></i>
+                        <div
+                                class="flex flex-grow-1 flex-shrink-1 flex-column align-items-start flex-grow-0 ml-2"
+                        >
+                            <div class="text-sm">{{ address }}</div>
+                            <div class="text-sm">Location</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid pt-5">
+                    <div
+                            *ngIf="CommonUtils.doesValueExist(data?.position?.details.charge)"
+                            class="col-4 gap-3 flex flex-row justify-content-start align-items-center"
+                    >
+                        <img
+                                src="{{
+                  trackingLinkService.getShareTrackingPageIcons(
+                    1,
+                    data?.position?.details.charge
+                  )
+                }}"
+                                alt="not found"
+                        />
+                        <div class="title mt-2 gap-1">
+                            <div class="text-sm">
+                                {{ data?.position?.details.charge === true ? "On" : "off" }}
+                            </div>
+                            <div class="text-sm">Power</div>
+                        </div>
+                    </div>
+
+                    <div
+                            *ngIf="CommonUtils.doesValueExist(data?.position?.details.ac)"
+                            class="col-4 gap-3 flex flex-row justify-content-start align-items-center"
+                    >
+                        <img
+                                src="{{
+                  trackingLinkService.getShareTrackingPageIcons(
+                    2,
+                    data?.position?.details.ac
+                  )
+                }}"
+                                alt="not found"
+                                alt="not found"
+                        />
+                        <div class="title mt-2 gap-1">
+                            <div class="text-sm">
+                                {{ data?.position?.details.ac }}
+                            </div>
+                            <div class="text-sm">Ac</div>
+                        </div>
+                    </div>
+
+                    <div
+                            *ngIf="CommonUtils.doesValueExist(data?.position?.details.temp)"
+                            class="col-4 gap-3 flex flex-row justify-content-start align-items-center"
+                    >
+                        <img
+                                src="{{
+                  trackingLinkService.getShareTrackingPageIcons(
+                    3,
+                    data?.position?.details.temp
+                  )
+                }}"
+                                alt="not found"
+                        />
+
+                        <div class="title mt-2 gap-1">
+                            <div class="text-sm">
+                                {{ data?.position?.details.temp.toFixed(1) }}
+                            </div>
+                            <div class="text-sm">Temperature</div>
+                        </div>
+                    </div>
+
+                    <div
+                            *ngIf="CommonUtils.doesValueExist(data?.position?.details.door)"
+                            class="col-4 gap-3 flex flex-row justify-content-start align-items-center"
+                    >
+                        <img
+                                src="{{
+                  trackingLinkService.getShareTrackingPageIcons(
+                    4,
+                    data?.position?.details.door
+                  )
+                }}"
+                                alt="not found"
+                        />
+                        <div class="title mt-2 gap-1">
+                            <div class="text-sm">
+                                {{ data?.position?.details.door }}
+                            </div>
+                            <div class="text-sm">Door</div>
+                        </div>
+                    </div>
+
+                    <div
+                            *ngIf="
+                CommonUtils.doesValueExist(data?.position?.details.extVolt)
+              "
+                            class="col-4 gap-3 flex flex-row justify-content-start align-items-center"
+                    >
+                        <img
+                                src="{{
+                  trackingLinkService.getShareTrackingPageIcons(
+                    5,
+                    data?.position?.details.extVolt
+                  )
+                }}"
+                                alt="not found"
+                        />
+                        <div class="title mt-2 gap-1">
+                            <div class="text-sm">
+                                {{ data?.position?.details.extVolt }}V
+                            </div>
+                            <div class="text-sm">Ext. Battery</div>
+                        </div>
+                    </div>
+
+                    <div
+                            *ngIf="
+                CommonUtils.doesValueExist(data?.position?.details.intVolt)
+              "
+                            class="col-4 gap-3 flex flex-row justify-content-start align-items-center"
+                    >
+                        <img
+                                src="{{
+                  trackingLinkService.getShareTrackingPageIcons(
+                    5,
+                    data?.position?.details.intVolt
+                  )
+                }}"
+                                alt="not found"
+                        />
+                        <div class="title mt-2 gap-1">
+                            <div class="text-sm">
+                                {{ data?.position?.details.intVolt }}V
+                            </div>
+                            <div class="text-sm">Int. Battery</div>
+                        </div>
+                    </div>
+
+                    <div
+                            *ngIf="
+                CommonUtils.doesValueExist(data?.position?.details.battper)
+              "
+                            class="col-4 gap-3 flex flex-row justify-content-start align-items-center"
+                    >
+                        <img
+                                src="{{
+                  trackingLinkService.getShareTrackingPageIcons(
+                    10,
+                    data?.position?.details.battper
+                  )
+                }}"
+                                alt="not found"
+                        />
+                        <div class="title mt-2 gap-1">
+                            <div class="text-sm">
+                                {{ data?.position?.details.battper }}%
+                            </div>
+                            <div class="text-sm">Int. Battery</div>
+                        </div>
+                    </div>
+
+                    <div
+                            *ngIf="CommonUtils.doesValueExist(data?.position?.valid)"
+                            class="col-4 gap-3 flex flex-row justify-content-start align-items-center"
+                    >
+                        <img
+                                src="{{
+                  trackingLinkService.getShareTrackingPageIcons(
+                    7,
+                    data?.position?.valid
+                  )
+                }}"
+                                alt="not found"
+                        />
+                        <div class="title mt-2 gap-1">
+                            <div class="text-sm">
+                                {{
+                                    data?.position?.valid === 1 ? "Available" : "Not Available"
+                                }}
+                            </div>
+                            <div class="text-sm">Gps</div>
+                        </div>
+                    </div>
+
+                    <div
+                            class="col-4 gap-3 flex flex-row justify-content-start align-items-center"
+                    >
+                        <img
+                                src="{{
+                  trackingLinkService.getShareTrackingPageIcons(
+                    8,
+                    data?.position?.speed
+                  )
+                }}"
+                                alt="not found"
+                        />
+                        <div class="title mt-2 gap-1">
+                            <div class="text-sm">
+                                {{
+                                    CommonUtils.checkUndefined(
+                                        data?.position?.speed,
+                                        0
+                                    ).toFixed(2)
+                                }}km/hr
+                            </div>
+                            <div class="text-sm">Speed</div>
+                        </div>
+                    </div>
+
+                    <div
+                            class="col-4 gap-3 flex flex-row justify-content-start align-items-center"
+                    >
+                        <img
+                                src="{{
+                  trackingLinkService.getShareTrackingPageIcons(
+                    14,
+                    data?.position?.details.totalDistance
+                  )
+                }}"
+                                alt="not found"
+                        />
+                        <div class="title mt-2 gap-1">
+                            <div class="text-sm">
+                                {{
+                                    (
+                                        CommonUtils.checkUndefined(
+                                            data.position.details.totalDistance,
+                                            0
+                                        ) / 1000
+                                    ).toFixed(2)
+                                }}km
+                            </div>
+                            <div class="text-sm">Odometer</div>
+                        </div>
+                    </div>
+                    <div
+                            class="col-4 gap-3 flex flex-row justify-content-start align-items-center"
+                    >
+                        <img
+                                style="height: 25px; width: 25px"
+                                src="{{
+                  trackingLinkService.getShareTrackingPageIcons(9, null)
+                }}"
+                                alt="not found"
+                        />
+                        <div class="title mt-2 gap-1">
+                            <div class="text-sm">
+                                {{
+                                    (
+                                        CommonUtils.checkUndefined(
+                                            data?.device?.details.lastOdometer,
+                                            0
+                                        ) / 1000
+                                    ).toFixed(2)
+                                }}Km
+                            </div>
+                            <div class="text-sm">Today kms</div>
+                        </div>
+                    </div>
+                    <div
+                            *ngIf="CommonUtils.doesValueExist(data?.position?.details.armed)"
+                            class="col-4 gap-3 flex flex-row justify-content-start align-items-center"
+                    >
+                        <img
+                                src="{{
+                  trackingLinkService.getShareTrackingPageIcons(
+                    11,
+                    data?.position?.details.armed
+                  )
+                }}"
+                                alt="not found"
+                        />
+                        <div class="title mt-2 gap-1">
+                            <div class="text-sm">
+                                {{
+                                    data?.device?.details.armed === true
+                                        ? "Immobilised "
+                                        : "Mobilised"
+                                }}
+                            </div>
+                            <div class="text-sm">Vehicle status</div>
+                        </div>
+                    </div>
+
+                    <div
+                            *ngIf="
+                CommonUtils.doesValueExist(data?.position?.details.wheelLock)
+              "
+                            class="col-4 gap-3 flex flex-row justify-content-start align-items-center"
+                    >
+                        <img
+                                src="{{
+                  trackingLinkService.getShareTrackingPageIcons(
+                    13,
+                    data?.position?.details.wheelLock
+                  )
+                }}"
+                                alt="not found"
+                                alt="not found"
+                        />
+                        <div class="title mt-2 gap-1">
+                            <div class="text-sm">
+                                {{
+                                    data?.position?.details.wheelLock === true
+                                        ? "Lock"
+                                        : "Unlock"
+                                }}
+                            </div>
+                            <div class="text-sm">Wheel status</div>
+                        </div>
+                    </div>
+
+                    <div
+                            *ngIf="CommonUtils.doesValueExist(data?.position?.details.bmsSOC)"
+                            class="col-4 gap-3 flex flex-row justify-content-start align-items-center"
+                    >
+                        <img
+                                src="{{
+                  trackingLinkService.getShareTrackingPageIcons(
+                    12,
+                    data?.position?.details.bmsSOC
+                  )
+                }}"
+                                alt="not found"
+                                alt="not found"
+                        />
+                        <div class="title mt-2 gap-1">
+                            <div class="text-sm">
+                                {{ data?.position?.details.bmsSOC.toFixed(3) }}
+                            </div>
+                            <div class="text-sm">SOC</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 sm:col-12 md:col-7 lg:col-8 xl:col-8">
+        <div class="card h-full">
+            <div class="graph">
+                <div id="sharingMap" style="height: 90vh"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<p-toast></p-toast>

@@ -1,0 +1,69 @@
+<div
+  class="flex flex-column align-items-center justify-content-center h-screen w-screen absolute top-0 left-0"
+  style="z-index: 3000; background-color: rgba(0, 0, 0, 0.6)"
+>
+  <form [formGroup]="userUpdateForm" (ngSubmit)="saveChanges()">
+    <div
+      class="surface-card p-5 shadow-2 gap-2 flex flex-column w-11 sm:w-30rem"
+      style="border-radius: 14px"
+    >
+      <div class="text-2xl font-bold">Update Vehicle</div>
+
+      <span >
+        <label class="text-xl	block" for="vehicleType" 
+          >Vehicle Type</label
+        >
+        <p-dropdown
+          [options]="deviceService.vehicleType"
+          optionLabel="name"
+          optionValue="id"
+          id="vehicleType"
+          formControlName="vehicleType"
+          placeholder="Select a category"
+          [style]="{ minWidth: '100%' }"
+
+        ></p-dropdown>
+      </span>
+      <span >
+        <label class="text-xl	" for="vehicleNo">Vehicle Number</label>
+        <input
+          type="text"
+          name="vehicleNo"
+          pInputText
+          id="vehicleNo"
+          formControlName="vehicleNo"
+          class="w-full text-xl mt-2"
+        />
+      </span>
+      <span >
+        <label class="text-xl	" for="speedLimit">Speed Limit</label>
+        <input
+          type="text"
+          name="speedLimit"
+          pInputText
+          id="speedLimit"
+          formControlName="speedLimit"
+          class="w-full text-xl mt-2"
+        />
+      </span>
+      <div class="flex flex-row justify-content-start gap-4">
+        <button
+        pButton
+          label="Submit"
+          style="background-color: #22c55e"
+          class="text-xl"
+
+          type="submit"
+        ></button>
+        <button
+        pButton
+          (click)="cancel()"
+          class="text-xl"
+
+          label="Cancel"
+          style="background-color: #1797b0"
+        ></button>
+      </div>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,102 @@
+<div
+  class="flex flex-column align-items-center justify-content-center h-screen w-screen absolute top-0 left-0"
+  style="z-index: 3000; background-color: rgba(0, 0, 0, 0.6)"
+  (drop)="onDrop($event)"
+  (dragover)="onDragOver($event)"
+>
+  <div
+    class="flex flex-column gap-4 bg-gray-100  w-9 p-4 border-round-3xl"
+  >
+    <div class="flex flex-row justify-content-between mb-2">
+      <p class="text-3xl font-bold">File Upload</p>
+      <i class="pi pi-times cursor-pointer" (click)="resetUpload()"></i>
+    </div>
+
+    <div class="flex flex-row gap-2 w-full">
+      <div class="flex flex-row justify-content-evenly gap-3 w-6">
+        <button             style="background-color: #1797b0"
+        pButton class="pi pi-cloud-upload w-6 h-10rem border-0" (click)="selectFile()">
+          <label for="files"> Select File</label>
+        </button>
+        <button
+          pButton             style="background-color: #1797b0"
+
+          (click)="downloadHeaderAsExcel()"
+          class="w-6 pi border-0 pi-cloud-download h-10rem"
+          label="Download Sheet Format"
+        ></button>
+      </div>
+      <div class="flex flex-column w-6">
+        <div
+          class="flex flex-row gap-2 h-10rem border-round-xl border-dashed border-blue-800 align-items-center justify-content-center"
+        >
+          <p *ngIf="!file" class="p-m-0 text-base">
+            'Drag and drop or browse your file'
+          </p>
+          <input
+            id="files"
+            class="hidden"
+            *ngIf="!file"
+            pInputText
+            type="file"
+            accept=".xlsx,xlsm,.csv,.xls "
+            (change)="onFileChange($event)"
+          />
+          <p *ngIf="file" class="p-m-0">{{ file.name }}</p>
+        </div>
+        <div class="flex justify-content-start">
+          <small>Only .xlsx,xlsm,.csv,.xls files are accepted </small>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-content bg-white p-4 border-round-xl">
+      <div>
+        <p-table
+          #dataTable
+          [value]="fileContent.rows"
+          [scrollable]="true"
+          [scrollHeight]="'300px'"
+          [tableStyle]="{ 'min-width': '100rem' }"
+        >
+          <ng-template pTemplate="header" let-columns>
+            <tr class="text-lg font-bold">
+              <th class="white-space-nowrap" *ngFor="let col of fileHeaders">{{ col }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-rowData let-columns="columns">
+            <tr>
+              <td *ngFor="let cell of rowData">{{ cell }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+      <div class="mt-2"
+        *ngIf="
+          !fileContent ||
+          !fileContent.headers ||
+          fileContent.headers.length === 0
+        "
+      >
+        No data to display.
+      </div>
+
+      <div
+        *ngIf="
+          !fileContent ||
+          !fileContent.headers ||
+          fileContent.headers.length === 0
+        "
+      ></div>
+    </div>
+    <div class="flex justify-content-center gap-2">
+      <button
+        pButton
+        class="border-round-3xl"
+        label="Upload"
+        (click)="uploadFile()"
+        [disabled]="!file || uploading"
+      ></button>
+    </div>
+  </div>
+</div>

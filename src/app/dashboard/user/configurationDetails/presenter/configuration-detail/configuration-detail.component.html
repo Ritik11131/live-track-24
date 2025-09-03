@@ -1,0 +1,95 @@
+<form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+    <div class="flex flex-row justify-content-between">
+        <div formGroupName="webConfig">
+            <p class="text-2xl font-semibold">Web Configuration</p>
+            <p class="text-xl font-semibold">Reports</p>
+            <div formGroupName="reports">
+                <div *ngFor="let item of webConfigReports">
+                    <label class="text-xl">
+                        <input type="checkbox" [formControlName]="item.value" (click)="checkId($event)" />
+                        {{ item.label }}
+                    </label>
+                </div>
+            </div>
+
+            <p class="text-xl font-semibold">Commands</p>
+            <div formGroupName="actions">
+                <div *ngFor="let item of webConfigActions">
+                    <label class="text-xl">
+                        <input type="checkbox" [formControlName]="item.value" (click)="checkId($event)" />
+                        {{ item.label }}
+                    </label>
+                </div>
+            </div>
+
+            <p class="text-xl font-semibold">Options</p>
+            <div formGroupName="options">
+                <div *ngFor="let item of webConfigOptions">
+                    <label class="text-xl">
+                        <input type="checkbox" [formControlName]="item.value" (click)="checkId($event)" />
+                        {{ item.label }}
+                    </label>
+                </div>
+            </div>
+
+            <p class="text-xl font-semibold">Permissions</p>
+            <div formGroupName="permissions">
+                <div *ngFor="let item of webConfigPermissions">
+                    <label class="text-xl">
+                        <input type="checkbox" [formControlName]="item.value" (click)="checkId($event)" />
+                        {{ item.label }}
+                    </label>
+                </div>
+            </div>
+
+        </div>
+
+        <div formGroupName="androidConfig">
+            <p class="text-2xl font-semibold">App Configuration</p>
+
+            <p class="text-xl font-semibold">Reports</p>
+            <div formGroupName="reports">
+                <div *ngFor="let item of androidConfigReports">
+                    <label class="text-xl">
+                        <input type="checkbox" [formControlName]="item.value" (click)="checkId($event)" />
+                        {{ item.label }}
+                    </label>
+                </div>
+            </div>
+
+            <p class="text-xl font-semibold">Commands</p>
+            <div formGroupName="actions">
+                <div *ngFor="let item of androidConfigActions">
+                    <label class="text-xl">
+                        <input type="checkbox" [formControlName]="item.value" (click)="checkId($event)" />
+                        {{ item.label }}
+                    </label>
+                </div>
+            </div>
+
+            <p class="text-xl font-semibold">Options</p>
+            <div formGroupName="options">
+                <div *ngFor="let item of androidConfigOptions">
+                    <label class="text-xl">
+                        <input type="checkbox" [formControlName]="item.value" (click)="checkId($event)" />
+                        {{ item.label }}
+                    </label>
+                </div>
+            </div>
+            <p class="text-xl font-semibold">Permissions</p>
+            <div formGroupName="permissions">
+                <div *ngFor="let item of androidConfigPermissions">
+                    <label class="text-xl">
+                        <input type="checkbox" [formControlName]="item.value" (click)="checkId($event)" />
+                        {{ item.label }}
+                    </label>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="col-12 flex gap-2 flex-row">
+        <button [disabled]="fkUserId===0" style="background-color: #22c55e" pButton pRipple type="submit" label="Save" class="w-auto text-xl mt-3"></button>
+        <button pButton pRipple style="background-color: #1797b0" type="button" (click)="cancel()" label="Cancel" class="w-auto text-xl mt-3"></button>
+    </div>
+</form>

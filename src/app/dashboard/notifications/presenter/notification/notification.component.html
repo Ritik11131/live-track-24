@@ -1,0 +1,136 @@
+<div class="grid">
+  <div
+    [ngClass]="
+      fullDisplay ? 'hidden' : 'col-12 sm:col-12 md:col-5 lg:col-4 xl:col-3'
+    "
+  >
+    <div class="card" style="height: 77vh">
+      <div
+        class="flex flex-column flex-wrap gap-2 align-items-center justify-content-between"
+      >
+        <p-dropdown
+          class="w-full"
+          [style]="{ width: '100%' }"
+          [options]="reports"
+          optionLabel="name"
+          optionValue="code"
+          (onChange)="onDropdownChange($event)"
+          placeholder="Select a Notification Type"
+        ></p-dropdown>
+
+        <p-dropdown
+          autoWidth="false"
+          class="w-full "
+          [style]="{ width: '100%' }"
+          [options]="devices"
+          [filter]="true"
+          [resetFilterOnHide]="true"
+          optionLabel="vehicleNo"
+          optionValue="id"
+          (onChange)="onDropdownChange1($event)"
+          placeholder="Select Vehicle"
+        ></p-dropdown>
+
+        <button
+          pButton
+          class="w-full text-xl"
+          style="background-color: #1797B0;"
+          label="GET Notifications"
+          (click)="getNotification(false)"
+        ></button>
+      </div>
+    </div>
+  </div>
+  <div
+    [ngClass]="
+      fullDisplay ? 'col-12' : 'col-12 sm:col-12 md:col-7 lg:col-8 xl:col-9'
+    "
+  >
+    <div class="card" style="height: 77vh">
+      <p-table
+        #dt
+        id="reportTable"
+        [paginator]="true"
+        [rows]="10"
+        [value]="notifications"
+        (onPage)="paginate($event)"
+        [scrollable]="true"
+        scrollHeight="55vh"
+        [showCurrentPageReport]="true"
+        responsiveLayout="scroll"
+        class="h-full"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [globalFilterFields]="['vehicleNo', 'notificationType']"
+      >
+        <ng-template pTemplate="caption">
+          <div
+            class="flex flex-wrap gap-2 align-items-center justify-content-between"
+          >
+            <div class="flex align-items-center gap-2">
+              <!-- <button  (click)="toggleArrow()"  pButton class=" justify-content-center border-circle align-items-center" style="padding:5px">
+            <i [ngClass]="fullDisplay ? 'pi pi-arrow-right' : 'pi pi-arrow-left'" ></i>
+           </button> -->
+              <h3 class="m-0 font-semibold">Notifications</h3>
+            </div>
+            <span
+              class="p-input-icon-left ml-2 w-full sm:w-20rem flex-order-1 sm:flex-order-0"
+            >
+              <i class="pi pi-search"></i>
+              <input
+                pInputText
+                type="text"
+                (input)="onDropDownGlobalFilter(dt, $event)"
+                placeholder="Search"
+                class="w-full text-xl"
+                />
+            </span>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+          <tr class="text-2xl">
+            <th pSortableColumn="vehicleNo" class="white-space-nowrap">
+              Vehicle No<p-sortIcon field="vehicleNo"></p-sortIcon>
+            </th>
+            <th pSortableColumn="notificationType" class="white-space-nowrap">
+              Notification Type
+              <p-sortIcon field="notificationType"></p-sortIcon>
+            </th>
+            <th pSortableColumn="timestamp" class="white-space-nowrap">
+              Time Stamp <p-sortIcon field="timestamp"></p-sortIcon>
+            </th>
+            <th pSortableColumn="Location" class="white-space-nowrap">
+              Location <p-sortIcon field="Location"></p-sortIcon>
+            </th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-notifications>
+          <tr  class="text-xl white-space-nowrap">
+            <ng-container *ngIf="notificationLoading; else notificationData">
+              <!-- Skeleton loading UI -->
+              <td p-skeleton></td>
+              <td p-skeleton></td>
+              <td p-skeleton></td>
+              <td p-skeleton></td>
+            </ng-container>
+            <ng-template #notificationData>
+              <!-- Actual data -->
+              <td>{{ notifications.details.vNo }}</td>
+              <td>{{ notifications.type }}</td>
+              <td>{{ notifications.eventtime }}</td>
+              <td>{{ notifications.details.address }}</td>
+            </ng-template>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6"></td>
+          </tr>
+        </ng-template>
+     
+      </p-table>
+    </div>
+  </div>
+</div>
+
+<p-toast></p-toast>

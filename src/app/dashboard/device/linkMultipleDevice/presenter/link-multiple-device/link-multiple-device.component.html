@@ -1,0 +1,72 @@
+<div
+  class="absolute top-0 bottom-0 left-0 right-0 flex justify-content-center align-items-center"
+  style="background-color: rgba(0, 0, 0, 0.5); z-index: 3000"
+>
+  <form [formGroup]="devicesLinkForm" (ngSubmit)="onConfirm()">
+    <div
+      class="surface-card p-5 shadow-2 gap-3 flex flex-column w-11 sm:w-30rem"
+      style="border-radius: 14px"
+    >
+      <p class="text-2xl font-bold">{{title}}</p>
+
+      <span>
+        <label class="text-xl" for="deviceId">Unique Id</label>
+        <input
+          type="text"
+          name="deviceId"
+          pInputText
+          id="deviceId"
+          formControlName="deviceId"
+          readonly
+          class="w-full text-xl mt-2"
+        />
+      </span>
+
+      <span *ngIf="title==='Link Multiple Devices'" class="flex flex-column justify-content-center">
+        <label class="text-xl" for="userName">UserName</label>
+        <p-dropdown
+          [style]="{ width: '100%' }"
+          class="mt-2"
+          [options]="users"
+          formControlName="selectedId"
+          placeholder="Select User"
+          optionLabel="loginId"
+          display="chip"
+          [style]="{ minWidth: '100%' }"
+          [showClear]="true"
+        ></p-dropdown>
+      </span>
+      <span *ngIf="title==='Link Plan'" class="flex flex-column justify-content-center">
+        <label class="text-xl" for="userName">Plan Name</label>
+        <p-dropdown
+          [style]="{ width: '100%' }"
+          class="mt-2"
+          [options]="billingPLans"
+          formControlName="selectedId"
+          placeholder="Select Plan"
+          optionLabel="planName"
+          display="chip"
+          [style]="{ minWidth: '100%' }"
+          [showClear]="true"
+        ></p-dropdown>
+      </span>
+      <div class="flex flex justify-content-start gap-4">
+        <button
+          pButton
+          label="Confirm"
+          pRipple
+          type="submit"
+          style="background-color: #22c55e"
+          class="text-xl"
+        ></button>
+        <button
+          pButton
+          style="background-color: #1797b0"
+          class="text-xl"
+          label="Cancel"
+          (click)="onCancel()"
+        ></button>
+      </div>
+    </div>
+  </form>
+</div>

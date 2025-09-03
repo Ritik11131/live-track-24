@@ -1,0 +1,494 @@
+ <div class="grid">
+  <div
+    class="col-12 sm:col-12"
+    [ngClass]="{
+      hidden: fullDisplay,
+      'md:col-5 lg:col-5 xl:col-4': isLarge && !fullDisplay,
+      'md:col-4 lg:col-4 xl:col-3': !isLarge && !fullDisplay
+    }"
+    [ngSwitch]="showTemplate"
+  >
+    <div *ngIf="replayControls" class="card px-0 h-full">
+      <div *ngSwitchCase="'device-list'">
+        <div
+          class="flex justify-content-between flex-row px-4 align-items-center"
+        >
+          <div class="flex align-items-center mb-3 pt-4">
+            <span class="p-input-icon-left">
+              <i class="pi pi-search"></i>
+              <input
+                type="text"
+                placeholder="Search"
+                class="p-inputtext-lg flex flex-grow-1"
+                pInputText
+                (input)="search()"
+                [(ngModel)]="searchQuery"
+              />
+            </span>
+          </div>
+          <p-button
+            pTooltip="Refresh Vehicle List"
+            tooltipPosition="top"
+            [rounded]="true"
+            icon="pi pi-refresh"
+            [style]="{ 'background-color': '#BCD7F8', color: 'black' }"
+            class="justify-content-center"
+            (click)="getVehicleList()"
+          >
+          </p-button>
+        </div>
+        <ng-container *ngIf="isLoading; else content">
+          <div class="flex px-4 justify-content-between align-items-center">
+            <div
+              pRipple
+              class="card vehicle-category flex cursor-pointer flex-column border-round-3xl p-1 shadow-2 gap-1 justify-content-center"
+            >
+              <div
+                style="padding: 7px"
+                class="border-circle flex cursor-pointer justify-content-center align-items-center"
+              >
+                <img src="" />
+              </div>
+              <p class="category-name align-self-center m-0">
+                <p-skeleton></p-skeleton>
+              </p>
+            </div>
+          </div>
+
+          <div class="px-4"><p-divider></p-divider></div>
+
+          <div
+            class="graph flex flex-column align-items-center"
+            style="max-height: 60vh; overflow: auto"
+          >
+            <div class="vehicle-info w-11">
+              <div class="card p-0 overflow-hidden flex flex-column mb-2">
+                <div class="flex shadow-2 justify-content-start p-3">
+                  <p-skeleton></p-skeleton>
+                  <div
+                    class="flex flex-column justify-content-start flex-grow-1"
+                  >
+                    <p-skeleton></p-skeleton>
+                    <div class="flex justify-content-between">
+                      <p-skeleton></p-skeleton>
+                    </div>
+                  </div>
+                  <div class="align-self-center">
+                    <i
+                      pRipple
+                      class="pi pi-arrow-circle-right"
+                      style="font-size: 1.5rem; cursor: pointer"
+                    ></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+        <ng-template #content>
+          <div class="flex px-4 justify-content-between align-items-center">
+            <!-- <div  *ngFor="let category of categories">
+              <div class="h-6rem w-4rem flex flex-column justify-content-center align-items-center gap-1 border-round-2xl border-2 border-solid border-gray-700"
+              [ngClass]="{'category-idle': category.description== 'Idle',
+              'category-running': category.description== 'Running',
+              'category-offline': category.description== 'Offline',
+              'category-all': category.description== 'All',
+              'category-stop': category.description== 'Stopped',
+              'category-nodata': category.description== 'NeverConnected'}">
+              <img class="h-2rem w-2rem" src="assets/demo/images/category/category-icon1.svg"/>
+              <p class="text-black text-sm m-0">{{category.description==="NeverConnected"? "NoData": category.description}}</p>
+              <p class="text-black text-sm m-0">{{ category.count }}</p>
+              </div>
+            </div>
+             -->
+
+            <div
+              (click)="filterByCategory(category.description, i)"
+              pRipple
+              class="card vehicle-category flex cursor-pointer flex-column border-3xl p-1 shadow-2 gap-1 justify-content-center"
+              *ngFor="let category of categories; let i = index"
+              [class.active-category]="isActiveCategory(i)"
+              [style.background-color]="
+                isActiveCategory(i) ? '#f0f0f0' : 'transparent'
+              "
+              [style.border]="isActiveCategory(i) ? '1px solid #ccc' : 'none'"
+            >
+              <div
+                style="padding: 3px; width: 35px; height: 35px"
+                [style.background-color]="getcolor1(category.description)"
+                class="border-circle flex cursor-pointer justify-content-center align-items-center"
+              >
+                <img
+                  style="width: 30px"
+                  src="assets/map_marker.png"
+                />
+              </div>
+              <p class="category-name text-lg align-self-center m-0">
+                {{ category.count }}
+              </p>
+            </div>
+          </div>
+
+          <div class="px-4"><p-divider></p-divider></div>
+
+          <div
+            class="graph flex flex-column align-items-center"
+            style="max-height: 60vh; overflow: auto"
+          >
+            <div class="vehicle-info w-11" *ngFor="let info of fileredVehicles">
+              <div
+                class="card vehicle-list p-0 overflow-hidden flex flex-column mb-2"
+              >
+                <div class="flex shadow-2 justify-content-start p-3">
+                  <div class="w-2rem h-2rem mr-3 align-self-center">
+                    <img [src]="getColor(info.position.status.status)" />
+                    <!-- <i
+                      class="pi pi-car"
+                      style="font-size: 1.5rem"
+                      [ngStyle]="{
+                        color: getColor(info.position.status.status)
+                      }"
+                    ></i> -->
+                  </div>
+
+                  <div
+                    class="flex flex-column justify-content-start flex-grow-1"
+                  >
+                    <span
+                      class="block text-lg white-space-nowrap flex-grow-1"
+                      >{{ info.device!.vehicleNo }}</span
+                    >
+                    <div class="flex justify-content-between">
+                      <span class="text-lg block text flex align-self-start">{{
+                        getStatusName(info.position.status.status) +
+                          " " +
+                          (info.position.status.duration === undefined
+                            ? ""
+                            : info.position.status.duration)
+                      }}</span>
+                    </div>
+                  </div>
+                  <div class="flex align-items-center justify-content-center">
+                    <i
+                      pRipple
+                      class="pi pi-angle-double-right font-bold"
+                      style="font-size: 1.7rem; cursor: pointer"
+                      (click)="showDetails(info)"
+                    ></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+      <div *ngSwitchCase="'device-details'">
+        <div
+          class="grid flex-row px-4 justify-content-start align-items-center py-2"
+        >
+          <div (click)="switchView()" class="cursor-pointer col-4 flex">
+            <i
+              class="pi pi-angle-left line-height-3"
+              style="font-size: 1.5rem"
+            ></i>
+            <p>Back</p>
+          </div>
+          <h5 class="m-0 col-6" style="font-size: 14px">
+            <b>{{ details_title }}</b>
+          </h5>
+          <p class="col-2 cursor-pointer" (click)="refreshDetailPage()">
+            Refresh
+          </p>
+        </div>
+
+        <div class="px-4"></div>
+        <div class="graph">
+          <p-tabMenu
+            [ngClass]="'custom-menu-item'"
+            [model]="items"
+            [activeItem]="activeItem"
+            (activeItemChange)="onActiveItemChange($event)"
+          ></p-tabMenu>
+          <router-outlet></router-outlet>
+        </div>
+      </div>
+    </div>
+    <div
+      class="fixed top-0 left-0 h-screen w-screen flex justify-content-center align-items-center"
+      style="z-index: 99999; background-color: rgba(0, 0, 0, 0.6)"
+      *ngIf="progressSpinner"
+    >
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+
+    <div *ngIf="!replayControls" class="card h-full flex flex-column gap-2">
+      <div class="flex flex-column gap-2" style="height: 43vh">
+        <div
+          class="flex gap-2 mb-2 flex-row justify-content-start align-items-center"
+        >
+          <div (click)="closeHistoryReplay()" class="cursor-pointer">
+            <i class="pi pi-angle-left font-bold" style="font-size: 1.5rem"></i>
+          </div>
+          <div class="text-2xl font-bold">
+            History Replay( {{ details_title }} )
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="col-5 text-xl p-1">Start Time</div>
+          <div class="col-7 text-xl font-semibold p-1">
+            {{ selectedStartDate | date : "yyyy-MM-dd, HH:mm:ss" }}
+          </div>
+
+          <div class="col-5 text-xl p-1">End Time</div>
+          <div class="col-7 text-xl font-semibold p-1">
+            {{ selectedEndDate | date : "yyyy-MM-dd, HH:mm:ss" }}
+          </div>
+
+          <div class="col-5 text-xl p-1">Time</div>
+          <div class="col-7 text-xl font-semibold p-1">{{ timeStamp }}</div>
+          <div class="col-5 text-xl p-1">Speed</div>
+          <div class="col-7 text-xl font-semibold p-1">
+            {{ VehicleSpeed }} km/hr
+          </div>
+          <div class="col-5 text-xl p-1">Travelled Distance</div>
+          <div class="col-7 text-xl font-semibold p-1">
+            {{ distanceTravelled.toFixed(3) }}Km
+          </div>
+          <div class="col-5 text-xl p-1">Total Distance</div>
+          <div class="col-7 text-xl font-semibold p-1">
+            {{ totalTravelDistance.toFixed(3) }}Km
+          </div>
+        </div>
+
+        <div
+          class="align-items-center gap-2 flex flex-row justify-content-between"
+        >
+          <div class="w-full">
+            <input
+              #seekbar
+              class="w-full"
+              type="range"
+              [(ngModel)]="seekbarValue"
+              (input)="updateProgress()"
+              [disabled]="!playPause"
+            />
+            <div class="seekbar-progress" [style.width]="progressWidth"></div>
+          </div>
+
+          <button
+            pButton
+            (click)="playPauseFunction()"
+            pRipple
+            class="flex justify-content-center align-items-center border-circle"
+            style="background-color: #1797b0; height: 35px; width: 40px"
+          >
+            <i
+              [ngClass]="playPause ? 'pi pi-pause' : 'pi  pi-play'"
+              style="font-size: 1.5rem; line-height: 1.5"
+            ></i>
+          </button>
+          <button
+            pButton
+            (click)="changeSpeed()"
+            pRipple
+            class="flex justify-content-center align-items-center border-circle"
+            style="background-color: #1797b0; height: 35px; width: 40px"
+          >
+            {{ speed }}x
+          </button>
+        </div>
+        <div class="flex gap-2">
+          <button
+            pButton
+            style="background-color: #1797b0"
+            (click)="showIdlePoints()"
+            class="w-full"
+            label="Show Idles"
+          ></button>
+          <button
+            pButton
+            style="background-color: #1797b0"
+            (click)="showStopPoints()"
+            class="w-full"
+            label="Show Stops"
+          ></button>
+          <button
+            pButton
+            style="background-color: #1797b0"
+            (click)="restartMovement()"
+            class="w-full"
+            label="Restart"
+          ></button>
+        </div>
+      </div>
+
+      <div>
+        <p-tabView>
+          <p-tabPanel class="text-xl" header="Stop Points"
+            ><ng-container *ngIf="tripStopLocations.length > 0; else noRecords">
+              <div
+                class="flex flex-column gap-2 overflow-y-scroll"
+                style="height: 32vh"
+              >
+                <div
+                  (click)="showStopPointOnMap(stop)"
+                  *ngFor="let stop of tripStopLocations"
+                  class="flex line-height-3 flex-column p-3 border-round-2xl bg-gray-100 shadow-2 gap-2"
+                >
+                  <div
+                    class="flex flex-row justify-content-between cursor-pointer align-items-center"
+                  >
+                    <div
+                      class="flex text-lg justify-content-start font-semibold"
+                    >
+                      {{ stop.dormantStart | date : "MMM dd, yyyy" }}
+                    </div>
+                    <div
+                      class="flex text-lg justify-content-center align-items-center border-circle"
+                    >
+                      {{ stop.duration }}
+                    </div>
+                  </div>
+                  <div class="flex flex-row justify-content-between">
+                    <div class="flex flex-row justify-content-center gap-1">
+                      <div class="text-lg">Start Time</div>
+                      <div class="text-lg font-semibold text-green-500">
+                        {{ stop.dormantStart | date : "HH:mm:ss" }}
+                      </div>
+                    </div>
+
+                    <div class="flex flex-row justify-content-center gap-1">
+                      <div class="text-lg">End Time</div>
+                      <div class="text-lg font-semibold text-red-500">
+                        {{ stop.dormantEnd | date : "HH:mm:ss" }}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-row text-lg">
+                    {{ stop.address }}
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+            <ng-template #noRecords>
+              <div
+                class="flex justify-content-center align-items-center text-center"
+              >
+                No records found For this trip
+              </div>
+            </ng-template></p-tabPanel
+          >
+          <p-tabPanel class="text-xl" header="Idle Points"
+            ><ng-container *ngIf="tripIdleLocations.length > 0; else noRecords">
+              <div
+                class="flex flex-column gap-2 overflow-y-scroll"
+                style="height: 32vh"
+              >
+                <div
+                  (click)="showIdlePointOnMap(idle)"
+                  *ngFor="let idle of tripIdleLocations"
+                  class="flex line-height-3 flex-column p-3 border-round-2xl bg-gray-100 shadow-2 gap-2"
+                >
+                  <div
+                    class="flex flex-row cursor-pointer justify-content-between align-items-center"
+                  >
+                    <div
+                      class="flex text-lg justify-content-start font-semibold"
+                    >
+                      {{ idle.dormantStart | date : "MMM dd, yyyy" }}
+                    </div>
+                    <div
+                      class="flex text-lg justify-content-center align-items-center border-circle"
+                    >
+                      {{ idle.duration }}
+                    </div>
+                  </div>
+                  <div class="flex flex-row justify-content-between">
+                    <div class="flex flex-row justify-content-center gap-1">
+                      <div class="text-lg">Start Time</div>
+                      <div class="text-lg font-semibold text-green-500">
+                        {{ idle.dormantStart | date : "HH:mm:ss" }}
+                      </div>
+                    </div>
+
+                    <div class="flex flex-row justify-content-center gap-1">
+                      <div class="text-lg">End Time</div>
+                      <div class="text-lg font-semibold text-red-500">
+                        {{ idle.dormantEnd | date : "HH:mm:ss" }}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-row text-lg">
+                    {{ idle.address }}
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+            <ng-template #noRecords>
+              <div
+                class="flex justify-content-center align-items-center text-center"
+              >
+                No records found For this trip
+              </div>
+            </ng-template></p-tabPanel
+          >
+        </p-tabView>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="col-12 sm:col-12"
+    [ngClass]="{
+      'col-11': fullDisplay,
+      'md:col-7  lg:col-8   xl:col-8': isLarge && !fullDisplay,
+      'md:col-8  lg:col-8  xl:col-9': !isLarge && !fullDisplay
+    }"
+  >
+    <div
+      class="card h-full relative"
+      style="overflow: hidden; padding-bottom: 30px"
+    >
+      <div class="flex align-items-center justify-content-between gap-2 mb-2">
+        <!-- <button (click)="toggleArrow()" pButton class=" justify-content-center border-circle align-items-center" style="padding:5px">
+        <i   [ngClass]="fullDisplay ? 'pi pi-arrow-right' : 'pi pi-arrow-left'" ></i>
+       </button> -->
+        <p style="font-size: 14px" class="m-0 font-bold">Map View</p>
+
+        <p-multiSelect
+          *ngIf="showTemplate === 'device-details' && replayControls"
+          [options]="linkedGeofences"
+          placeholder="Select Geofence"
+          optionLabel="geometryName"
+          optionValue="id"
+          display="chip"
+          class="w-full"
+          [(ngModel)]="selectedGeofences"
+          [showClear]="true"
+          class="w-3"
+          (onChange)="linkedGeofenceDropdown($event)"
+        >
+          ></p-multiSelect
+        >
+      </div>
+
+      <div id="map" style="height: 70vh"></div>
+      <div class="top-right-button">
+        <p-button
+          *ngIf="showTemplate === 'device-details' && replayControls"
+          tooltipPosition="top"
+          pTooltip="Current Location"
+          [rounded]="true"
+          class="top-right-button"
+          icon="pi pi-map-marker"
+          severity="info"
+          (click)="plotCurrentLocation()"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+<p-toast></p-toast>

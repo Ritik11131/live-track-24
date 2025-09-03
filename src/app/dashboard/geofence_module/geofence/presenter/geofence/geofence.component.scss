@@ -1,0 +1,23 @@
+
+
+:host ::ng-deep {
+    .speeddial-tooltip-demo {
+        .p-speeddial-direction-up {
+       
+
+            &.speeddial-right {
+               right: 40px;
+               bottom:50px;
+                position: absolute;
+                z-index: 999;
+            }
+        }
+    }
+}
+::ng-deep .p-dropdown .p-dropdown-label {
+    font-size: 13px !important; /* Override the label font size */
+    }
+    
+    ::ng-deep .p-dropdown .p-dropdown-items .p-dropdown-item {
+    font-size: 13px !important; /* Override the item font size */
+    }

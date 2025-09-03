@@ -1,0 +1,62 @@
+<div
+  class="flex flex-column align-items-center justify-content-center h-screen w-screen absolute top-0 left-0"
+  style="z-index: 3000; background-color: rgba(0, 0, 0, 0.6)"
+>
+  <div
+    class="flex flex-column bg-gray-100 xl:w-3 md:w-4 sm:w-6 w-9 p-4 border-round-3xl gap-3"
+  >
+    <p class="text-2xl font-bold">Generate Device Tracking Limit</p>
+    <div>
+      <p-calendar
+        placeholder="End Date"
+        [style]="{ width: '100%' }"
+        [(ngModel)]="date"
+        [showTime]="true"
+        [showSeconds]="true"
+        class="cursor-pointer"
+        [minDate]="minDate"
+        class="text-xl"
+      ></p-calendar>
+    </div>
+
+   
+        <input type="text"         class=" text-xl"
+        pInputText [(ngModel)]="deviceTrackingLink" />
+     
+
+
+    <div class="flex flex-row justify-content-start gap-4">
+      <button
+      pButton
+        label="Generate"
+        style="background-color: #22c55e"
+        class="  white-space-nowrap  cursor-pointer text-xl"
+
+        (click)="submit()"
+      ></button>
+      <button
+      pButton
+        (click)="closeDialogBox()"
+        label="Cancel"
+        class="  white-space-nowrap  cursor-pointer text-xl"
+
+        style="background-color: #1797B0"
+      ></button>
+      <button
+      pButton
+      (click)="copyToClipboard()"
+      class="  white-space-nowrap  cursor-pointer text-xl"
+      style="background-color: #1797B0"
+
+      label="Copy Link"
+    ></button>
+    <button
+    pButton
+    style="background-color: #1797B0"
+    class="  white-space-nowrap  cursor-pointer text-xl"
+(click)="openLink()"
+      label="Open Link"
+    ></button>
+    </div>
+  </div>
+</div>

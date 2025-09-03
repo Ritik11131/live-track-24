@@ -1,0 +1,7 @@
+textarea:focus,
+input:focus,
+select:focus {
+    outline: none !important;
+    outline-width: 0;
+    box-shadow: none;
+}

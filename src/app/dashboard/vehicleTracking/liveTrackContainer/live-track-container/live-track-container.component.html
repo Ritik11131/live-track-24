@@ -1,0 +1,18 @@
+<p-tabView>
+    <p-tabPanel header="Live Track">
+      <app-live-track [vehicleid]="vehicleid" [map]="map"></app-live-track>
+    </p-tabPanel>
+    <p-tabPanel header="Vehicle Trips">
+      <app-vehicle-trips [vehicleid]="vehicleid" [map]="map"></app-vehicle-trips>
+    </p-tabPanel>
+    <p-tabPanel header="Stop Locations">
+      <app-vehicle-stop-locations [vehicleid]="vehicleid" [map]="map"></app-vehicle-stop-locations>
+    </p-tabPanel>
+    <p-tabPanel header="SOC Graph">
+      <app-soc-graph [vehicleid]="vehicleid" [map]="map"></app-soc-graph>
+    </p-tabPanel>
+    <p-tabPanel header="Temperature Analysis">
+      <app-temperature-analysis [vehicleid]="vehicleid" [map]="map"></app-temperature-analysis>
+    </p-tabPanel>
+  </p-tabView>
+  

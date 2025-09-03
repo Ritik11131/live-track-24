@@ -1,0 +1,75 @@
+<div
+  class="flex flex-column justify-content-center align-items-center gap-3 p-3"
+>
+  <input
+    class="w-full cursor-pointer"
+    pInputText
+    (click)="openDateComponent()"
+    placeholder="Select Date"
+    [(ngModel)]="dateRange"
+  />
+  <!-- <div class="w-full">
+    <div class="card h-full">
+      <canvas class="h-full" id="lineChart" width="400" height="220"></canvas>
+    </div>
+  </div> -->
+
+
+
+  <div class="w-full">
+    <div *ngIf="!showData"  class="no-data-message">
+      No Data for the selected Date
+    </div>
+ 
+      <canvas class="h-full" id="lineChart" width="400" height="200"></canvas>
+  </div>
+  
+
+
+
+
+
+
+
+  <div *ngIf="showData" 
+    class="flex line-height-3 w-full flex-column p-3 border-round-2xl bg-gray-100 shadow-2 gap-2"
+  >
+    <div class="flex flex-row justify-content-start gap-1">
+      <div class="text-xl font-bold">Start Time :</div>
+      <div class="font-semibold text-xl text-green-500">
+        {{ startDate | date : "MMM dd, yyyy-HH:mm:ss" }}
+      </div>
+    </div>
+
+    <div class="text-xl">
+      {{ startAddress }}
+    </div>
+
+    <div class="flex flex-row justify-content-start gap-1">
+      <div class="text-xl font-bold">End Time :</div>
+      <div class="text-xl font-semibold text-red-500">
+        {{ endDate | date : " MMM dd, yyyy-HH:mm:ss" }}
+      </div>
+    </div>
+
+    <div class="text-xl">
+      {{ endAddress }}
+    </div>
+    <div class="flex flex-row justify-content-between">
+      <div class="flex flex-column justify-content-between">
+        <div class="text-xl font-bold">Avg SOC</div>
+        <div class="font-semibold text-xl">{{ avgSoc }}</div>
+      </div>
+      <div class="flex flex-column justify-content-between">
+        <div class="text-xl font-bold">Max SOC</div>
+        <div class="font-semibold text-xl">{{ maxSoc }} </div>
+      </div>
+      <div class="flex flex-column justify-content-between">
+        <div class="text-xl font-bold">Min SOC</div>
+        <div class="font-semibold text-xl">{{ minSoc }} </div>
+      </div>
+    </div>
+  </div>
+</div>
+<app-date-picker *ngIf="dateComponent"></app-date-picker>
+<p-toast></p-toast>

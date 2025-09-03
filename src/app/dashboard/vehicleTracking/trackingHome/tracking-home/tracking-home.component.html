@@ -1,0 +1,31 @@
+<div class="grid">
+  <div
+    *ngIf="map"
+    class="col-12 sm:col-12  lg:col-4 xl:col-3"
+    [ngSwitch]="showTemplate"
+  >
+    <div *ngIf="replayControls" class="card px-0 h-full">
+      <div *ngSwitchCase="'device-list'">
+        <app-vehicle-list
+          (shiftView)="changeViewtoLiveTrack($event)"
+          [map]="map"
+        ></app-vehicle-list>
+      </div>
+      <div *ngSwitchCase="'live-track'">
+        
+        <app-live-track-container        (dateRange)="changeViewToHistoryReplay($event)"
+        [map]="map" [vehicleid]="id"></app-live-track-container>
+      </div>
+    </div>
+    <div *ngIf="!replayControls" class="card h-90vh flex flex-column gap-2">
+      <app-history-replay [selectedDateRange]="selectedDateRange"  [map]="map" [vehicleid]="id"
+      ></app-history-replay>
+    </div>
+  </div>
+
+  <div class="col-12 sm:col-12  lg:col-8 xl:col-9">
+    <div class="card h-full" style="height: 60vh">
+      <div id="map" style="height: 80vh"></div>
+    </div>
+  </div>
+</div>

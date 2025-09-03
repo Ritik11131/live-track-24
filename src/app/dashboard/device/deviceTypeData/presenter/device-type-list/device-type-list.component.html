@@ -1,0 +1,52 @@
+<div   class="absolute top-0 bottom-0 left-0 right-0 flex justify-content-center align-items-center"
+style="background-color: rgba(0, 0, 0, 0.5); z-index: 3000">
+<div class="card w-4">
+    <div class="flex justify-content-between">
+  <h3 class="m-0 font-semibold">Device Types</h3>
+<i class="pi pi-times" (click)="close()"></i>
+</div>
+  <p-table
+    #dt
+    [value]="deviceTypes"
+    [paginator]="true"
+    [rows]="10"
+    dataKey="deviceId"
+    rowExpandMode="single"
+    [showCurrentPageReport]="true"
+    responsiveLayout="scroll"
+    [scrollable]="true"
+    scrollHeight="35vh"
+ 
+    [globalFilterFields]="[
+      'name',
+      'serverPort',
+      'serverIp',
+    
+    ]"
+  >
+    <ng-template pTemplate="header">
+      <tr class="text-2xl">
+        <th pSortableColumn="name" class="white-space-nowrap">
+            Name
+          <p-sortIcon field="name"></p-sortIcon>
+        </th>
+        <th pSortableColumn="serverIp" class="white-space-nowrap">
+            Server Ip <p-sortIcon field="serverIp"></p-sortIcon>
+        </th>
+        <th pSortableColumn="serverPort" class="white-space-nowrap">
+            Server Port
+          <p-sortIcon field="serverPort"></p-sortIcon>
+        </th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-deviceType let-expanded="expanded">
+      <tr class="text-xl">
+        <td>{{ deviceType.name }}</td>
+        <td>{{ deviceType.serverIp }}</td>
+        <td>{{ deviceType.serverPort }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+</div>

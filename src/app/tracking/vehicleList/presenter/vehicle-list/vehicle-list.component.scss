@@ -1,0 +1,23 @@
+h5:first-child, h6:first-child {
+  margin: 0 !important;
+  padding: 0.5rem 0 !important;;
+}
+.p-ripple {
+  margin-bottom: 0 !important;
+}
+.text-style{
+  font-size: 9px;
+}
+.vehicle-list{
+line-height: 1.5;
+}
+.custom-icon {
+  font-size: 2rem; /* Adjust the font size as needed */
+}
+
+.top-right-button {
+  position: absolute;
+  top: 30px; /* Adjust this value as needed */
+  right: 15px; /* Adjust this value as needed */
+  z-index: 1000; /* Ensure the button is above other content */
+}

@@ -1,0 +1,260 @@
+<div class="grid">
+  <div class="col-12">
+    <div
+      class="card flex-column md:gap-0 gap-2 md:flex-row flex justify-content-between"
+      style="background-color: #1fa8c4"
+    >
+      <p
+        *ngIf="selectedVehicle && bmsData && selectedbattery"
+        class="m-0 font-bold align-self-center"
+      >
+        🔋ID : KSDK23652HD2723N | ⚡AH : 100AH | 🔌VOL : 48V
+      </p>
+      <div class="flex w-12 md:w-6 gap-2">
+        <p-dropdown
+          autoWidth="false"
+          class="w-6"
+          [style]="{ width: '100%' }"
+          [options]="devices"
+          [filter]="true"
+          [resetFilterOnHide]="true"
+          optionLabel="vehicleNo"
+          optionValue="id"
+          (onChange)="onDropdownChange1($event)"
+          placeholder="Select Vehicle"
+        ></p-dropdown>
+
+        <p-dropdown
+          autoWidth="false"
+          class="w-6"
+          [style]="{ width: '100%' }"
+          [options]="batteries"
+          [filter]="true"
+          [resetFilterOnHide]="true"
+          optionLabel="batteryNo"
+          optionValue="id"
+          (onChange)="onDropdownChange2($event)"
+          placeholder="Select Battery"
+        ></p-dropdown>
+      </div>
+    </div>
+  </div>
+  <ng-container
+    *ngIf="selectedVehicle && bmsData && selectedbattery; else illustration"
+  >
+    <div class="col-12 lg:col-8">
+      <div class="card h-full grid m-0">
+        <div class="col-4 md:col-2" *ngFor="let item of mainDataArray">
+          <div
+            style="min-height: 140px"
+            class="card flex flex-column justify-content-center align-items-center"
+          >
+            <img
+              [src]="item.imageUrl"
+              style="height: 25px; width: 25px"
+              alt="{{ item.key }}"
+              class="item-image"
+            />
+
+            <p class="text-2xl font-semibold text-center">
+              {{ item.key }}
+            </p>
+            <p class="text-2xl font-semibold">{{ item.value }}</p>
+          </div>
+        </div>
+
+        <div class="col-12 md:col-6 flex flex-column">
+          <div class="card" style="min-height: 230px">
+            <div class="flex justify-content-between">
+              <p class="text-2xl m-0 font-semibold">Cell Voltage</p>
+              <p class="text-2xl m-0 font-semibold">
+                Cell Voltage Difference :
+                {{ (bmsData.BMS.B4 - bmsData.BMS.B6).toFixed(3) }}
+              </p>
+            </div>
+            <div class="flex gap-4">
+              <div
+                class="w-6 flex flex-column justify-content-center align-items-center"
+              >
+                <p-knob
+                  class="text-2xl"
+                  [size]="100"
+                  valueColor="lightgreen"
+                  [(ngModel)]="bmsData.BMS.B6"
+                />
+                <p class="text-2xl font-semibold">
+                  Min Vol Cell No : {{ bmsData.BMS.B7 }}
+                </p>
+              </div>
+              <div
+                class="w-6 flex flex-column justify-content-center align-items-center"
+              >
+                <p-knob
+                  [size]="100"
+                  valueColor="red"
+                  [(ngModel)]="bmsData.BMS.B4"
+                />
+                <p class="text-2xl font-semibold">
+                  Max Vol Cell No : {{ bmsData.BMS.B5 }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 md:col-6 flex flex-column">
+          <div class="card" style="min-height: 230px">
+            <div class="font-semibold">Temperature</div>
+            <div class="flex justify-content-between">
+              <div
+                class="w-6 flex flex-column justify-content-center align-items-center"
+              >
+                <p-knob
+                  [size]="100"
+                  [max]="500"
+                  valueColor="lightgreen"
+                  [(ngModel)]="bmsData.BMS.B9"
+                />
+                <p class="text-2xl font-semibold">
+                  Min Temp : {{ bmsData.BMS.B9 }}
+                </p>
+              </div>
+              <div
+                class="w-6 flex flex-column justify-content-center align-items-center"
+              >
+                <p-knob
+                  [size]="100"
+                  [max]="500"
+                  [ngModel]="bmsData.BMS.B8"
+                  [valueColor]="'red'"
+                >
+                  <ng-template let-value>
+                    <span *ngIf="value < 220">{{ value }}</span>
+                  </ng-template>
+                </p-knob>
+
+                <p class="text-2xl font-semibold">
+                  Max Temp : {{ bmsData.BMS.B8 }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-4 md:col-2" *ngFor="let item of otherDataArray">
+          <div
+            style="min-height: 140px"
+            class="card flex flex-column justify-content-center align-items-center"
+          >
+            <img
+              [src]="item.imageUrl"
+              style="height: 25px; width: 25px"
+              alt="{{ item.key }}"
+              class="item-image"
+            />
+            <p class="text-2xl font-semibold text-center">
+              {{ item.key }}
+            </p>
+            <p class="text-2xl text-center font-semibold">{{ item.value }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 lg:col-4">
+      <div class="map card">
+        <div id="dashboardMap" style="height: 60vh"></div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="card flex flex-column">
+        <div class="flex justify-content-between">
+          <div class="font-semibold">Cell Voltages</div>
+          <div class="flex gap-2">
+            <p class="font-bold mb-0" (click)="sortCellVoltages()">
+              {{ isAscending ? "Descending" : "Ascending" }}
+            </p>
+            <i
+              class="line-height-3"
+              [ngClass]="!isAscending ? 'pi pi-arrow-up' : 'pi pi-arrow-down'"
+            ></i>
+          </div>
+        </div>
+        <div class="flex flex-row w-full align-items-center">
+          <!-- <p-button class="scroll-button left" (click)="scrollLeft()" icon="pi pi-angle-left" [rounded]="true" severity="secondary"></p-button> -->
+
+          <div class="w-full h-full grid">
+            <div class="col max-w-20rem" *ngFor="let item of cellVoltages">
+              <div
+                class="card flex flex-column justify-content-center align-items-center"
+              >
+                <p class="text-lg font-semibold m-0">{{ item.key }}</p>
+                <p
+                  [style.background-image]="
+                    item.value > 3.4
+                      ? 'url(\'assets/demo/images/vehicle-detail/batteryPer_high.svg\')'
+                      : item.value < 3
+                      ? 'url(\'assets/demo/images/vehicle-detail/batteryPer_low.svg\')'
+                      : 'url(\'assets/demo/images/vehicle-detail/batteryPer_middle.svg\')'
+                  "
+                  class="text-xl item-card font-semibold"
+                >
+                  {{ item.value }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- <p-button class="scroll-button right" (click)="scrollRight()" icon="pi pi-angle-right" [rounded]="true" severity="secondary"></p-button> -->
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 lg:col-6">
+      <div class="card">
+        <canvas
+          class="pb-4"
+          width="400"
+          style="height: 300px; /* Adjust this value as needed */"
+          #currentTempChart
+        ></canvas>
+      </div>
+    </div>
+    <div class="col-12 lg:col-6">
+      <div class="card">
+        <canvas
+          class="pb-4"
+          width="400"
+          style="height: 300px; /* Adjust this value as needed */"
+          #lineTempertureChart
+        ></canvas>
+      </div>
+    </div>
+    <div class="col-12 lg:col-6">
+      <div class="card">
+        <canvas
+          class="pb-4"
+          width="400"
+          style="height: 300px; /* Adjust this value as needed */"
+          #multiLineCellChart
+        ></canvas>
+      </div>
+    </div>
+    <div class="col-12 lg:col-6">
+      <div class="card">
+        <canvas
+          class="pb-4"
+          width="400"
+          style="height: 300px; /* Adjust this value as needed */"
+          #multiLineVsChart
+        ></canvas>
+      </div>
+    </div>
+  </ng-container>
+  <ng-template #illustration>
+    <div class="flex w-full justify-content-center align-items-center">
+      <img class="flex w-11 sm:w-6" src="assets/no_selected_device.PNG" />
+    </div>
+  </ng-template>
+</div>

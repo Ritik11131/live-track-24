@@ -1,0 +1,44 @@
+<div
+  class="absolute top-0 bottom-0 left-0 right-0 flex justify-content-center align-items-center"
+  style="background-color: rgba(0, 0, 0, 0.5); z-index: 3000"
+>
+  <div class="bg-white border-round-xl flex flex-column p-4 xl:w-3 lg:w-3  md-w-4 sm:w-5 w-6 gap-3">
+    <div>
+      <div>
+        <ng-container *ngIf="title !== undefined; else confirmButton">
+          <span>To confirm, type </span>
+          <span class="text-red-300 font-bold">"{{ title }}"</span>
+          <span> in the box below</span>
+        </ng-container>
+        <ng-template #confirmButton>
+          <span>To confirm, click on the confirm button</span>
+        </ng-template>
+      </div>
+    </div>
+    <input
+      *ngIf="title !== undefined"
+      class="w-full text-xl"
+      pInputText
+      type="text"
+      [(ngModel)]="inputValue"
+    />
+    <div class="flex flex justify-content-start gap-4">
+      <button
+      pButton
+        label="Confirm"
+        (click)="onConfirm()"
+        style="background-color: #22c55e"
+        class=" text-xl"
+        [disabled]="
+        
+          title !== undefined && (title !== inputValue || inputValue === '')
+        "
+      >
+      </button>
+
+      <button   pButton          style="background-color: #1797B0"
+      class=" text-xl"
+      label="Cancel" (click)="onCancel()"></button>
+    </div>
+  </div>
+</div>

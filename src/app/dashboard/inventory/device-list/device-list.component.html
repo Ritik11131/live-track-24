@@ -1,0 +1,181 @@
+<div class="card mt-3">
+    <p-table
+      #dt
+      [value]="devices"
+      [paginator]="true"
+      [rows]="10"
+      [showCurrentPageReport]="true"
+      responsiveLayout="scroll"
+      [scrollable]="true"
+      scrollHeight="65vh"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      [(selection)]="selectedDevices"
+      [globalFilterFields]="[
+        'vehicleNo',
+        'deviceId',
+        'deviceImei',
+        'simPhoneNumber',
+        'simSecPhoneNumber',
+        'fkVehicleType',
+        'description'
+      ]"
+    >
+      <ng-template pTemplate="caption">
+        <div
+          class="flex flex-wrap gap-2 align-items-center justify-content-between"
+         >
+          <span>
+            <button
+              [disabled]="!(selectedDevices.length != 0)"
+              pButton
+              type="button"
+              label="Delete"
+              (click)="openDialog()"
+              
+              class="p-button-danger mr-2"
+            ></button>
+            <span
+              class="p-input-icon-left   w-full sm:w-20rem flex-order-1 sm:flex-order-0"
+             >
+              <i class="pi pi-search"></i>
+              <input
+                pInputText
+                type="text"
+                (input)="onGlobalFilter(dt, $event)"
+                placeholder="Search"
+                class="w-full"
+              />
+            </span>
+          </span>
+          <div class="flex gap-2 ">
+  
+            <button
+            pButton
+            (click)="openFileUploadComponent()"
+            class="p-button-outlined border-dashed w-full sm:w-auto flex-order-0 sm:flex-order-1"
+            icon="pi pi-cloud-upload"
+            label="Upload a file"
+          ></button>
+            <button
+              (click)="navigateToCreateDevice()"
+              pButton
+              class="p-button-outlined w-full  sm:w-auto flex-order-0 sm:flex-order-1"
+              icon="pi pi-user-plus"
+              label="Add New Device"
+            ></button>
+          </div>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="header">
+        <tr>
+          <th></th>
+  
+          <th pSortableColumn="vehicleNo" class="white-space-nowrap">
+            VehicleNo
+            <p-sortIcon field="vehicleNo"></p-sortIcon>
+          </th>
+          <th pSortableColumn="deviceId" class="white-space-nowrap">
+            Unique Id <p-sortIcon field="deviceId"></p-sortIcon>
+          </th>
+          <th pSortableColumn="deviceImei" class="white-space-nowrap">
+            Device IMEI
+            <p-sortIcon field="deviceImei"></p-sortIcon>
+          </th>
+          <th pSortableColumn="simPhoneNumber" class="white-space-nowrap">
+            P.Phone No
+            <p-sortIcon field="simPhoneNumber"></p-sortIcon>
+          </th>
+          <th pSortableColumn="simSecPhoneNumber" class="white-space-nowrap">
+            S.Phone No
+            <p-sortIcon field="simSecPhoneNumber"></p-sortIcon>
+          </th>
+          <th pSortableColumn="fkVehicleType" class="white-space-nowrap">
+            Vehicle Type
+            <p-sortIcon field="fkVehicleType"></p-sortIcon>
+          </th>
+          <th pSortableColumn="description" class="white-space-nowrap">
+            Description
+            <p-sortIcon field="description"></p-sortIcon>
+          </th>
+  
+          <th
+            style="min-width: 175px;"
+            pFrozenColumn
+            [frozen]="true"
+            alignFrozen="right"
+          >
+            Actions
+          </th>
+        </tr>
+      </ng-template>
+  
+      <ng-template pTemplate="body" let-rowUser >
+        <tr>
+  
+          <ng-container *ngIf="deviceData; else deviceinfo">
+            <!-- Skeleton loading UI -->
+            <td><p-skeleton></p-skeleton></td>
+            <td><p-skeleton></p-skeleton></td>
+            <td><p-skeleton></p-skeleton></td>
+            <td><p-skeleton></p-skeleton></td>
+            <td><p-skeleton></p-skeleton></td>
+            <td><p-skeleton></p-skeleton></td>
+            <td><p-skeleton></p-skeleton></td>
+            <td><p-skeleton></p-skeleton></td>
+            <td><p-skeleton></p-skeleton></td>
+          </ng-container>
+          <ng-template #deviceinfo>
+            <!-- Actual data -->
+            <td>
+              <p-tableCheckbox [value]="rowUser"></p-tableCheckbox>
+            </td>
+    
+            <td>{{ rowUser.vehicleNo }}</td>
+            <td>{{ rowUser.deviceId }}</td>
+            <td>{{ rowUser.deviceImei }}</td>
+            <td>{{ rowUser.simPhoneNumber }}</td>
+            <td>{{ rowUser.simSecPhoneNumber }}</td>
+            <td>{{ deviceService.getVehicleTypeLabel(rowUser.fkVehicleType) }}</td>
+            <td>{{ rowUser.description }}</td>
+            <td pFrozenColumn [frozen]="true" alignFrozen="right">
+              <button
+                pButton
+                pRipple
+                pTooltip="edit device"
+                tooltipPosition="bottom"
+                (click)="navigateToUpdateDevice(rowUser.deviceId)"
+                type="button"
+                class="p-button-rounded p-button-text"
+              >
+                <i class="pi pi-pencil" style="font-size: 1.3rem"></i>
+              </button>
+              <button
+                pButton
+                pRipple
+                pTooltip="link user"
+                tooltipPosition="bottom"
+                (click)="linkUser(rowUser.deviceId, rowUser.id)"
+                type="button"
+                class="p-button-rounded p-button-text"
+              >
+                <i class="pi pi-link" style="font-size: 1.5rem; color: green"></i>
+              </button>
+    
+   
+            </td>
+          </ng-template>
+     
+        </tr>
+      </ng-template>
+  
+     
+    </p-table>
+  </div>
+  <app-link-user
+    (closeForm)="closePopupForm($event)"
+    *ngIf="linkUserForm"
+  ></app-link-user>
+  <p-toast></p-toast>
+  <p-confirmDialog [style]="{'z-index': '3000'}"></p-confirmDialog>
+  <app-file-upload *ngIf="fileComponent"></app-file-upload>

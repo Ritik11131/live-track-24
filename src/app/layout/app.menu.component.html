@@ -1,0 +1,10 @@
+<div class="justify-content-center mb-2 flex lg:hidden " (click)="closeSidebar()">
+    <i class="pi pi-angle-down "></i>
+</div>
+
+<ul class="layout-menu ">
+    <li class="cursor-pointer" app-menuitem
+        *ngFor="let item of model; let i = index;" [item]="item" [index]="i"
+        [root]="true" [routerLink]="item.routerLink"></li>
+</ul>
+

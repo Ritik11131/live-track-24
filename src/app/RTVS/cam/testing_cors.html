@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Live Stream Viewer</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-color: #2563eb;
+      --secondary-color: #1e40af;
+      --background-dark: #111827;
+      --text-light: #f3f4f6;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--background-dark);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    #app-container {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      height: 100vh;
+    }
+
+    #player-container {
+      position: relative;
+      background: black;
+      overflow: hidden;
+    }
+
+    #player {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .top-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 1rem;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+      color: var(--text-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .stream-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .live-indicator {
+      background: #ef4444;
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .controls-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 1rem;
+      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .control-button {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: var(--text-light);
+      padding: 0.75rem;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      margin: 0 0.5rem;
+    }
+
+    .control-button:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .control-button.active {
+      background: var(--primary-color);
+    }
+
+    .sidebar {
+      background: var(--background-dark);
+      border-left: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-tabs {
+      display: flex;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .tab-button {
+      flex: 1;
+      padding: 1rem;
+      background: none;
+      border: none;
+      color: var(--text-light);
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+
+    .tab-button.active {
+      opacity: 1;
+      border-bottom: 2px solid var(--primary-color);
+    }
+
+    .tab-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+    }
+
+    .stream-history {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .history-item {
+      background: rgba(255,255,255,0.05);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      color: var(--text-light);
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .history-item:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .history-item-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .history-item-title {
+      font-weight: 600;
+    }
+
+    .history-item-date {
+      font-size: 0.875rem;
+      opacity: 0.7;
+    }
+
+    .intercom-panel {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .intercom-panel.active {
+      display: flex;
+    }
+
+    .intercom-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .message {
+      background: rgba(255,255,255,0.05);
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      color: var(--text-light);
+      max-width: 80%;
+    }
+
+    .message.incoming {
+      align-self: flex-start;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .message.outgoing {
+      align-self: flex-end;
+      background: var(--primary-color);
+    }
+
+    .intercom-controls {
+      padding: 1rem;
+      display: flex;
+      gap: 0.5rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    #intercomButton {
+      width: 100%;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.2s;
+    }
+
+    #intercomButton:hover {
+      background: var(--secondary-color);
+    }
+
+    #intercomButton.active {
+      background: #ef4444;
+    }
+
+    .channel-selector {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: var(--text-light);
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      min-width: 120px;
+    }
+
+    .channel-selector option {
+      background: var(--background-dark);
+      color: var(--text-light);
+    }
+
+    @media (max-width: 768px) {
+      #app-container {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 300px;
+        z-index: 100;
+      }
+
+      .sidebar.active {
+        display: flex;
+      }
+
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 99;
+      }
+
+      .sidebar-overlay.active {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+<div id="app-container">
+  <div id="player-container">
+    <div class="top-bar">
+      <div class="stream-info">
+        <span class="live-indicator">LIVE</span>
+      </div>
+      <div class="stream-controls">
+        <select class="channel-selector" onchange="changeView(this.value)">
+          <option value="1">Road View</option>
+          <option value="2">Driver View</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="player"></div>
+
+    <div class="controls-overlay">
+      <div class="left-controls">
+        <button class="control-button" onclick="togglePlay()" id="playPauseButton">
+          <i class="fas fa-play"></i>
+        </button>
+        <button class="control-button" onclick="toggleIntercom()" id="intercomButton">
+          <i class="fas fa-microphone"></i>
+        </button>
+      </div>
+      <div class="right-controls">
+        <button class="control-button" onclick="toggleSidebar()">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-tabs">
+      <button class="tab-button active" onclick="switchTab('history')">History</button>
+      <button class="tab-button" onclick="switchTab('intercom')">Intercom</button>
+    </div>
+
+    <div class="tab-content">
+      <div class="stream-history" id="historyTab">
+        <input type="date" class="channel-selector" onchange="handleDateChange(this.value)">
+        <button class="control-button" onclick="loadVideos()" style="width: 100%">
+          Load Videos
+        </button>
+        <div id="recordingsList"></div>
+      </div>
+
+      <div class="intercom-panel" id="intercomTab">
+        <div class="intercom-messages" id="intercomMessages"></div>
+        <div class="intercom-controls">
+          <button id="intercomToggleButton" onclick="toggleIntercom()">
+            Start Intercom
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="../../../assets/camera/CvNet.js"></script>
+<script type="text/javascript" src="../../../assets/camera/LiveStreamPlayer.js"></script>
+<script>
+  let player;
+  let isIntercomActive = false;
+  let selectedDate = null;
+
+  window.onload = function() {
+    const playerElement = document.getElementById('player');
+    const params = new URLSearchParams(window.location.search);
+    const simNumber = params.get('sim') || '';
+
+    player = new LiveStreamPlayer(playerElement, {
+      simNumber: simNumber,
+      onStateChange: (state) => {
+        updatePlayPauseButton(state);
+        if (window.Android) {
+          window.Android.onStateChange(JSON.stringify(state));
+        }
+      },
+      onError: (error) => {
+        console.error('Player error:', error);
+        if (window.Android) {
+          window.Android.onError(error);
+        }
+      },
+      onVideoList: (videos) => {
+        if (window.Android) {
+          window.Android.onVideoList(JSON.stringify(videos));
+        }
+        displayVideoList(videos);
+      }
+    });
+
+    window.player = player;
+  };
+
+  function updatePlayPauseButton(state) {
+    const button = document.getElementById('playPauseButton');
+    const icon = button.querySelector('i');
+    icon.className = state.isPlaying ? 'fas fa-pause' : 'fas fa-play';
+  }
+
+  function togglePlay() {
+    if (player) {
+      player.togglePlay();
+    }
+  }
+
+  function toggleIntercom() {
+    const button = document.getElementById('intercomButton');
+    const toggleButton = document.getElementById('intercomToggleButton');
+    isIntercomActive = !isIntercomActive;
+
+    if (isIntercomActive) {
+      if (player && player.startIntercom()) {
+        button.classList.add('active');
+        toggleButton.textContent = 'Stop Intercom';
+        toggleButton.classList.add('active');
+        addIntercomMessage('Intercom started', 'outgoing');
+      }
+    } else {
+      if (player) {
+        player.stopIntercom();
+        button.classList.remove('active');
+        toggleButton.textContent = 'Start Intercom';
+        toggleButton.classList.remove('active');
+        addIntercomMessage('Intercom stopped', 'outgoing');
+      }
+    }
+  }
+
+  function addIntercomMessage(message, type) {
+    const messagesContainer = document.getElementById('intercomMessages');
+    const messageElement = document.createElement('div');
+    messageElement.className = `message ${type}`;
+    messageElement.textContent = message;
+    messagesContainer.appendChild(messageElement);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+
+  function switchTab(tab) {
+    const tabs = document.querySelectorAll('.tab-button');
+    const historyTab = document.getElementById('historyTab');
+    const intercomTab = document.getElementById('intercomTab');
+
+    tabs.forEach(t => t.classList.remove('active'));
+    if (tab === 'history') {
+      tabs[0].classList.add('active');
+      historyTab.style.display = 'flex';
+      intercomTab.style.display = 'none';
+    } else {
+      tabs[1].classList.add('active');
+      historyTab.style.display = 'none';
+      intercomTab.style.display = 'flex';
+    }
+  }
+
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+  }
+
+  function changeView(channel) {
+    if (player) {
+      player.changeChannel(parseInt(channel));
+    }
+  }
+
+  function handleDateChange(date) {
+    selectedDate = date;
+    if (player) {
+      player.setMode(false);
+      player.queryVideoList(date, "00:00", "23:59");
+    }
+  }
+
+  function loadVideos() {
+    if (player) {
+      player.setMode(false);
+      if (selectedDate) {
+        player.queryVideoList(selectedDate, "00:00", "23:59");
+      } else {
+        player.loadDailyVideo();
+      }
+    }
+  }
+
+  function displayVideoList(videos) {
+    const container = document.getElementById('recordingsList');
+    container.innerHTML = '';
+
+    videos.forEach(video => {
+      const item = document.createElement('div');
+      item.className = 'history-item';
+
+      const startTime = new Date(video.startTime);
+      const endTime = new Date(video.endTime);
+
+      item.innerHTML = `
+                    <div class="history-item-header">
+                        <span class="history-item-title">${video.channel === 1 ? 'Road View' : 'Driver View'}</span>
+                        <button class="control-button" onclick='playVideo(${JSON.stringify(video)})'>
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    <div class="history-item-content">
+                        <div class="history-item-times">
+                            <div>
+                                <div class="time">${startTime.toLocaleTimeString()}</div>
+                                <div class="date">${startTime.toLocaleDateString()}</div>
+                            </div>
+                            <div>
+                                <div class="time">${endTime.toLocaleTimeString()}</div>
+                                <div class="date">${endTime.toLocaleDateString()}</div>
+                            </div>
+                        </div>
+                        <div class="history-item-meta">
+                            <span><i class="fas fa-clock"></i> ${video.duration}</span>
+                            <span><i class="fas fa-download"></i> ${video.fileSize}</span>
+                        </div>
+                    </div>
+                `;
+      container.appendChild(item);
+    });
+  }
+
+  function playVideo(video) {
+    if (player) {
+      player.setMode(false);
+      player.playVideoChunk(video);
+    }
+  }
+
+  window.cleanup = function() {
+    if (player) {
+      if (isIntercomActive) {
+        player.stopIntercom();
+      }
+      player.stopVideo();
+      player.clearData();
+      player = null;
+    }
+  };
+</script>
+</body>
+</html>

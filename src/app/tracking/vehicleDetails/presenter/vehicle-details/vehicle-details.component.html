@@ -1,0 +1,120 @@
+<div class="flex flex-column p-4 gap-2">
+  <div class="detail-page px-2">
+    <div class="grid">
+      <div class="flex flex-row overflow-x-auto gap-2 w-full overflow-y-hidden justify-content-between my-2">
+        <div class="wrapper w-full">
+          <div class="icon" id="left">
+            <i
+              class="pi pi-angle-left font-bold"
+              (click)="scroll('left')"
+            ></i>
+          </div>
+          <ul class="tabs-box" #tabsBox>
+            <li
+              *ngFor="let tab of tabs"
+              class="tab"
+              [class.active]="tab.active"
+              (click)="tab.action()"
+            >
+              {{ tab.label }}
+            </li>
+          </ul>
+          <div class="icon" id="right">
+            <i
+              class="pi pi-angle-right font-bold"
+              (click)="scroll('right')"
+            ></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-6 p-0 flex flex-row">
+        <i class="icon-style pi pi-sync"></i>
+        <div class="flex flex-column align-items-start ml-2">
+          <div *ngIf="data && data.position" class="text-style font-bold">
+            {{ data.position.servertime }}
+          </div>
+          <div class="text-style">Last Updated</div>
+        </div>
+      </div>
+      <div class="col-6 p-0 flex flex-row">
+        <i class="icon-style pi pi-book"></i>
+        <div class="flex flex-column align-items-start ml-2">
+          <div *ngIf="data && data.position" class="text-style font-bold">
+            {{data.position.status.status!=="dormant"?data.position.status.status:"Idle"}},{{ data.position.status.duration }}
+          </div>
+          <div class="text-style">Last Status</div>
+        </div>
+      </div>
+      <div
+        class="col-6 p-0 flex flex-row justify-content-start align-items-center"
+      >
+        <img
+          class="h-2rem w-2rem"
+          src="{{
+            vehicleListRepo.getDetailPageIcons(15, data.position.details.ign)
+          }}"
+          alt="not found"
+        />
+        <div class="flex flex-column align-items-start ml-2">
+          <div *ngIf="data && data.position" class="text-style font-bold">
+            {{ data.position.details.ign === true ? "On" : "off" }}
+          </div>
+          <div class="text-style">Ignition</div>
+        </div>
+      </div>
+      <ng-container *ngIf="data && data.validity">
+        <!-- *ngIf="convertData(data.validity.nextRechargeDate) <= 30" -->
+        <div
+          class="col-6 p-0 flex flex-row"
+        >
+          <i class="icon-style pi pi-clock"></i>
+          <div class="flex flex-column align-items-start ml-2">
+            <div *ngIf="data && data.validity" class="text-style font-bold">
+              {{ data.validity.nextRechargeDate }}
+            </div>
+            <div class="text-style">Expires In</div>
+          </div>
+        </div>
+      </ng-container>
+      <div class="col-12 flex p-0 justify-content-between align-items-center">
+        <div class="flex flex-row justify-content-between">
+          <i class="icon-style pi pi-map-marker"></i>
+          <div
+            class="flex flex-grow-1 flex-shrink-1 flex-column align-items-start flex-grow-0 ml-2"
+          >
+            <div class="text-style font-bold">{{ address }}</div>
+            <div class="text-style">Location</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid pt-5">
+      <ng-container *ngFor="let item of detailItems">
+        <div
+          *ngIf="item.condition()"
+          class="col-4 p-0 gap-3 flex flex-row justify-content-start align-items-center"
+        >
+          <img
+            src="{{
+              vehicleListRepo.getDetailPageIcons(
+                item.iconType,
+                item.detailValue()
+              )
+            }}"
+            alt="not found"
+          />
+          <div class="title mt-2 gap-1">
+            <div class="text-style font-bold">
+              {{ item.labelText() }}
+            </div>
+            <div class="text-style">{{ item.detailText }}</div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
+<app-date-picker *ngIf="dateComponent"></app-date-picker>
+<app-dialog *ngIf="dialogComponent"></app-dialog>

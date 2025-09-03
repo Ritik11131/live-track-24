@@ -1,0 +1,180 @@
+<div
+  class="flex flex-column "
+>
+  <div
+    class="flex mb-2 flex-row gap-1 border-1 border-round-lg p-2 justify-content-between align-items-center header"
+  >
+    <div class="flex gap-1">
+      <i class="pi pi-chevron-right" style="line-height: 1.5"></i>
+      <p class="m-0 text-base">Replay Controls</p>
+    </div>
+    <i class="pi pi-times" (click)="close()"></i>
+  </div>
+
+  <div class="flex flex-column gap-3">
+    <!-- <p class="m-0 text-md"><i class="pi pi-car mr-2"></i>Device : {{ historyData.vehicleNo }}</p> -->
+    <p class="m-0 text-md">
+      <img src="assets/vehicle-detail/odometer.svg" alt="" /> Total Distance :
+      {{ totalTravelDistance.toFixed(3) }} km
+    </p>
+    <p class="m-0 text-md">
+      <img
+        src="assets/vehicle-detail/distance.svg"
+        class="mr-1"
+        alt=""
+      />Current Distance : {{ distance.toFixed(3) }} km
+    </p>
+    <p class="m-0 text-md">
+      <i class="pi pi-gauge mr-2"></i>Speed :
+      {{ speedArray[index] }} km/h
+    </p>
+    <p class="m-0 text-md">
+      <i class="pi pi-clock mr-2"></i>TimeStamp :
+      {{ timeStamparray[index] | date : "yyyy-MM-dd, HH:mm:ss" }}
+    </p>
+  </div>
+
+  <div class="flex gap-1 justify-content-center align-items-center gap-1">
+    <p-slider
+      class="w-full"
+      type="range"
+      [min]="0"
+      [max]="100"
+      [(ngModel)]="seekValue"
+      (onChange)="seek(seekValue)"
+    ></p-slider>
+    <button
+      pButton
+      style="height: 40px; width: 60px; border-radius: 50%"
+      (click)="playPauseFunction()"
+      [icon]="!playPause ? 'pi pi-pause' : 'pi pi-play'"
+    ></button>
+
+    <button
+      pButton
+      class="flex justify-content-center align-items-center"
+      style="height: 40px; width: 25px; border-radius: 50%"
+      (click)="setSpeed()"
+    >
+      {{ speed }}x
+    </button>
+  </div>
+
+
+
+
+
+  <p-tabView>
+    <p-tabPanel class="text-xl" header="Stop Points"
+      ><ng-container *ngIf="tripStopLocations.length > 0; else noRecords">
+        <div
+          class="flex flex-column gap-2 overflow-y-scroll"
+          style="height: 32vh"
+        >
+          <div
+            (click)="showStopPointOnMap(stop)"
+            *ngFor="let stop of tripStopLocations"
+            class="flex line-height-3 flex-column p-3 border-round-2xl bg-gray-100 shadow-2 gap-2"
+          >
+            <div
+              class="flex flex-row justify-content-between cursor-pointer align-items-center"
+            >
+              <div
+                class="flex text-lg justify-content-start font-semibold"
+              >
+                {{ stop.dormantStart | date : "MMM dd, yyyy" }}
+              </div>
+              <div
+                class="flex text-lg justify-content-center align-items-center border-circle"
+              >
+                {{ stop.duration }}
+              </div>
+            </div>
+            <div class="flex flex-row justify-content-between">
+              <div class="flex flex-row justify-content-center gap-1">
+                <div class="text-lg">Start Time</div>
+                <div class="text-lg font-semibold text-green-500">
+                  {{ stop.dormantStart | date : "HH:mm:ss" }}
+                </div>
+              </div>
+
+              <div class="flex flex-row justify-content-center gap-1">
+                <div class="text-lg">End Time</div>
+                <div class="text-lg font-semibold text-red-500">
+                  {{ stop.dormantEnd | date : "HH:mm:ss" }}
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-row text-lg">
+              {{ stop.address }}
+            </div>
+          </div>
+        </div>
+      </ng-container>
+      <ng-template #noRecords>
+        <div
+          class="flex justify-content-center align-items-center text-center"
+        >
+          No records found For this trip
+        </div>
+      </ng-template></p-tabPanel
+    >
+    <p-tabPanel class="text-xl" header="Idle Points"
+      ><ng-container *ngIf="tripIdleLocations.length > 0; else noRecords">
+        <div
+          class="flex flex-column gap-2 overflow-y-scroll"
+          style="height: 32vh"
+        >
+          <div
+            (click)="showIdlePointOnMap(idle)"
+            *ngFor="let idle of tripIdleLocations"
+            class="flex line-height-3 flex-column p-3 border-round-2xl bg-gray-100 shadow-2 gap-2"
+          >
+            <div
+              class="flex flex-row cursor-pointer justify-content-between align-items-center"
+            >
+              <div
+                class="flex text-lg justify-content-start font-semibold"
+              >
+                {{ idle.dormantStart | date : "MMM dd, yyyy" }}
+              </div>
+              <div
+                class="flex text-lg justify-content-center align-items-center border-circle"
+              >
+                {{ idle.duration }}
+              </div>
+            </div>
+            <div class="flex flex-row justify-content-between">
+              <div class="flex flex-row justify-content-center gap-1">
+                <div class="text-lg">Start Time</div>
+                <div class="text-lg font-semibold text-green-500">
+                  {{ idle.dormantStart | date : "HH:mm:ss" }}
+                </div>
+              </div>
+
+              <div class="flex flex-row justify-content-center gap-1">
+                <div class="text-lg">End Time</div>
+                <div class="text-lg font-semibold text-red-500">
+                  {{ idle.dormantEnd | date : "HH:mm:ss" }}
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-row text-lg">
+              {{ idle.address }}
+            </div>
+          </div>
+        </div>
+      </ng-container>
+      <ng-template #noRecords>
+        <div
+          class="flex justify-content-center align-items-center text-center"
+        >
+          No records found For this trip
+        </div>
+      </ng-template></p-tabPanel
+    >
+  </p-tabView>
+
+</div>

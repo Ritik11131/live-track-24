@@ -1,0 +1,104 @@
+
+<div
+class="flex justify-content-between flex-row px-4 align-items-center"
+>
+<div class="flex align-items-center mb-3 pt-4">
+  <span class="p-input-icon-left">
+    <i class="pi pi-search"></i>
+    <input
+      type="text"
+      placeholder="Search"
+      class="p-inputtext-lg flex flex-grow-1"
+      pInputText
+      (input)="search()"
+      [(ngModel)]="searchQuery"
+    />
+  </span>
+</div>
+<p-button
+  pTooltip="Refresh Vehicle List"
+  tooltipPosition="top"
+  [rounded]="true"
+  icon="pi pi-refresh"
+  [style]="{ 'background-color': '#BCD7F8', color: 'black' }"
+  class="justify-content-center"
+  (click)="getVehicleList()"
+>
+</p-button>
+</div>
+<div class="flex px-4 justify-content-between align-items-center">
+ 
+
+    <div
+      (click)="filterByCategory(category.description, i)"
+      pRipple
+      class="card vehicle-category flex cursor-pointer flex-column border-3xl p-1 shadow-2 gap-1 justify-content-center"
+      *ngFor="let category of categories; let i = index"
+      [class.active-category]="isActiveCategory(i)"
+      [style.background-color]="
+        isActiveCategory(i) ? '#f0f0f0' : 'transparent'
+      "
+      [style.border]="isActiveCategory(i) ? '1px solid #ccc' : 'none'"
+    >
+      <div
+        style="padding: 3px; width: 35px; height: 35px"
+        [style.background-color]="getStatusDetails(category.description).color"
+        class="border-circle flex cursor-pointer justify-content-center align-items-center"
+      >
+        <img
+          style="width: 30px"
+          src="assets/demo/images/category/list_icon.svg"
+        />
+      </div>
+      <p class="category-name text-lg align-self-center m-0">
+        {{ category.count }}
+      </p>
+    </div>
+  </div>
+
+  <div class="px-4"><p-divider></p-divider></div>
+
+  <div
+    class="graph flex flex-column align-items-center"
+    style="max-height: 60vh; overflow: auto"
+  >
+    <div               (click)="showDetails(info)"           (click)="shiftView.emit(info.device.id)"
+
+    class="vehicle-info w-11" *ngFor="let info of filteredVehicles">
+      <div
+        class="card vehicle-list p-0 overflow-hidden flex flex-column mb-2"
+      >
+        <div class="flex shadow-2 justify-content-start p-3">
+          <div class="w-2rem h-2rem mr-3 align-self-center">
+            <img [src]="getStatusDetails(info.position.status.status).iconPath" />
+            <!-- <i
+              class="pi pi-car"
+              style="font-size: 1.5rem"
+              [ngStyle]="{
+                color: getColor(info.position.status.status)
+              }"
+            ></i> -->
+          </div>
+
+          <div
+            class="flex flex-column justify-content-start flex-grow-1"
+          >
+            <span
+              class="block text-lg white-space-nowrap flex-grow-1"
+              >{{ info.device!.vehicleNo }}</span
+            >
+            <div class="flex justify-content-between">
+              <span class="text-lg block text flex align-self-start">{{
+                getStatusDetails(info.position.status.status).statusName +
+                  " " +
+                  (info.position.status.duration === undefined
+                    ? ""
+                    : info.position.status.duration)
+              }}</span>
+            </div>
+          </div>
+        
+        </div>
+      </div>
+    </div>
+  </div>

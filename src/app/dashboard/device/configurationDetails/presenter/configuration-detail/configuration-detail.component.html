@@ -1,0 +1,43 @@
+<form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+    <div class="flex flex-row justify-content-between px-6 py-2">
+        <div>
+          <p  class="text-2xl font-bold">Web Configuration</p>
+          <div class="flex flex-column gap-2" formGroupName="webConfig">
+              <div class="flex flex-row gap-2"  *ngFor="let option of webConfigOptions">
+                <p-checkbox [binary]="true"  formControlName="{{ option.value }}" [value]="option.value">{{ option.label }}</p-checkbox>
+                <label  class="text-xl">{{ option.label }}</label>
+              </div>
+            </div>
+          
+        </div>
+        <div >
+          <p  class="text-2xl font-bold">Android Configuration</p>
+          <div  class="flex flex-column gap-2" formGroupName="androidConfig">
+              <div class="flex flex-row gap-2" *ngFor="let option of androidConfigOptions">
+
+                <p-checkbox [binary]="true" formControlName="{{ option.value }}" [value]="option.value">{{ option.label }}</p-checkbox>
+                <label  class="text-xl">{{ option.label }}</label>
+              </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="col-12 flex gap-2 flex-row">
+
+    <button                
+      style="background-color: #22c55e"
+    class="text-xl" pButton type="submit" label="Submit"></button>
+    <button
+    pButton
+    pRipple
+    style="background-color: #1797B0"
+
+    type="button"
+    (click)="cancel()"
+    label="Cancel"
+    class=" text-xl"
+  ></button>
+</div>
+  </form>
+  

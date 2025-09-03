@@ -1,0 +1,14 @@
+<div >
+    <div class="card-header">
+        Device Imei [{{command.DeviceId}}]
+    </div>
+    <div class="card-body">
+        <form [formGroup]="commandForm" >
+            <div class="form-group">
+                <label class="control-label">Command</label>
+                <input type="text" formControlName="Command" pInputText />
+            </div>
+            <p-button label="{{buttonText}}" icon="pi pi-search" size="small" (onClick)="onSubmit()"></p-button>
+        </form>
+    </div>
+</div>

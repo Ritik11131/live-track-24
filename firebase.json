@@ -1,0 +1,17 @@
+{
+  "hosting": {
+    "site": "livetrack24wl",
+    "public": "dist/verona-ng",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

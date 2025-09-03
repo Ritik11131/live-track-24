@@ -1,0 +1,288 @@
+<div class="card">
+  <div class="flex justify-content-between mb-2">
+    <h3 class="m-0 font-semibold">Plans</h3>
+  </div>
+  <p-table
+    #dt
+    [value]="billingPLans"
+    [paginator]="true"
+    [rows]="10"
+    dataKey="id"
+    rowExpandMode="single"
+    [showCurrentPageReport]="true"
+    responsiveLayout="scroll"
+    [scrollable]="true"
+    scrollHeight="60vh"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [globalFilterFields]="['userId', 'planName', 'creationTime']"
+  >
+    <ng-template pTemplate="caption">
+      <div
+        class="flex flex-wrap gap-2 align-items-center justify-content-between"
+      >
+        <span>
+          <span
+            class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0"
+          >
+            <i class="pi pi-search"></i>
+            <input
+              pInputText
+              type="text"
+              (input)="onGlobalFilter(dt, $event)"
+              placeholder="Search"
+              class="w-full text-xl"
+            />
+          </span>
+        </span>
+
+        <div class="flex gap-2">
+          <button
+            (click)="createCustomerPlan()"
+            pButton
+            class="p-button-outlined w-full text-xl sm:w-auto flex-order-0 sm:flex-order-1"
+            icon="pi pi-user-plus"
+            label="Add New Plan"
+          ></button>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr class="text-2xl">
+        <th pSortableColumn="planName" class="white-space-nowrap">
+          Plan Name <p-sortIcon field="planName"></p-sortIcon>
+        </th>
+        <th pSortableColumn="creationTime" class="white-space-nowrap">
+          Creation Time
+          <p-sortIcon field="creationTime"></p-sortIcon>
+        </th>
+
+        <!-- <th
+          style="min-width: 175px; padding-left: 70px"
+          pFrozenColumn
+          [frozen]="true"
+          alignFrozen="right"
+        > -->
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-rowUser let-expanded="expanded">
+      <tr class="text-xl">
+        <ng-container *ngIf="!billingData; else billingPLansInfo">
+          <!-- Skeleton loading UI -->
+          <td><p-skeleton></p-skeleton></td>
+          <td><p-skeleton></p-skeleton></td>
+        </ng-container>
+        <ng-template #billingPLansInfo>
+          <!-- Actual data -->
+
+          <td>{{ rowUser.planName }}</td>
+          <td>{{ rowUser.creationTime | date : "yyyy-MM-dd" }}</td>
+
+          <!-- <td pFrozenColumn [frozen]="true" alignFrozen="right"> -->
+          <td>
+            <button pButton (click)="toggleList(rowUser.id)">
+              More Actions
+            </button>
+
+            <ul *ngIf="visibleDropdown === rowUser.id" class="dropdown-list">
+              <li>
+                <button
+                  pRipple
+                  pButton
+                  label="View Plan Category"
+                  [pRowToggler]="rowUser"
+                  (click)="toggleRow(rowUser); $event.stopPropagation()"
+                  type="button"
+                  class="p-button-rounded p-button-text white-space-nowrap"
+                >
+                  <i
+                    class="mr-2"
+                    [ngClass]="expanded ? 'pi pi-eye' : 'pi pi-eye-slash'"
+                    style="font-size: 1.5rem; color: purple"
+                  ></i>
+                </button>
+              </li>
+              <li>
+                <button
+                  pButton
+                  pRipple
+                  label="Delete Plan "
+                  type="button"
+                  (click)="delete(rowUser.id)"
+                  class="p-button-rounded p-button-text white-space-nowrap"
+                >
+                  <i class="pi pi-trash mr-2" style="font-size: 1.3rem"></i>
+                </button>
+              </li>
+              <li>
+                <button
+                  pButton
+                  pRipple
+                  label="Update Plan Name"
+                  type="button"
+                  (click)="updateCustomerPlan(rowUser)"
+                  class="p-button-rounded p-button-text white-space-nowrap"
+                >
+                  <i class="pi pi-pencil mr-2" style="font-size: 1.3rem"></i>
+                </button>
+              </li>
+            </ul>
+          </td>
+        </ng-template>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="rowexpansion" let-rowUser>
+      <tr class="bg-gray-100">
+        <td colspan="12">
+          <div class="p-3">
+            <p-table
+              #dt1
+              [scrollable]="true"
+              responsiveLayout="scroll"
+              [value]="subPlans[rowUser.id]"
+              dataKey="userId"
+              scrollHeight="30vh"
+              [globalFilterFields]="[
+                'planId',
+                'name',
+                'duration',
+                'amount',
+                'tax',
+                'platformFee'
+              ]"
+            >
+              <ng-template pTemplate="caption">
+                <div
+                  class="flex flex-wrap gap-2 align-items-center justify-content-between"
+                >
+                  <span>
+                    <span
+                      class="p-input-icon-left w-full sm:w-20rem flex-order-1 sm:flex-order-0"
+                    >
+                      <i class="pi pi-search"></i>
+                      <input
+                        pInputText
+                        type="text"
+                        (input)="onDropDownGlobalFilter(dt1, $event)"
+                        placeholder="Search"
+                        class="w-full text-xl"
+                      />
+                    </span>
+                  </span>
+
+                  <div class="flex gap-2">
+                    <button
+                      (click)="createCustomerSubPlan(rowUser)"
+                      pButton
+                      class="p-button-outlined w-full text-xl sm:w-auto flex-order-0 sm:flex-order-1"
+                      icon="pi pi-user-plus"
+                      label="Add Plan Category"
+                    ></button>
+                  </div>
+                </div>
+              </ng-template>
+              <ng-template pTemplate="header">
+                <tr class="text-2xl">
+                  <th pSortableColumn="planId">
+                    Plan Id <p-sortIcon field="planId"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="Plan Name">
+                    Plan Name <p-sortIcon field="Plan Name"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="duration">
+                    Duration <p-sortIcon field="duration"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="amount">
+                    Amount <p-sortIcon field="amount"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="tax">
+                    Tax <p-sortIcon field="tax"></p-sortIcon>
+                  </th>
+                  <th pSortableColumn="platformFee">
+                    Platform Fee <p-sortIcon field="platformFee"></p-sortIcon>
+                  </th>
+                  <th>Actions</th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-subPlan>
+                <tr class="text-xl">
+                  <ng-container *ngIf="!subPlanData; else subPlaninfo">
+                    <!-- Skeleton loading UI -->
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                    <td><p-skeleton></p-skeleton></td>
+                  </ng-container>
+                  <ng-template #subPlaninfo>
+                    <!-- Actual data -->
+                    <td>{{ subPlan.durations.planId }}</td>
+                    <td>{{ subPlan.durations.name }}</td>
+                    <td>{{ subPlan.durations.duration }} days</td>
+                    <td>Rs. {{ subPlan.durations.amount.toFixed(2) }}</td>
+                    <td>{{ subPlan.durations.tax.toFixed(2) }} %</td>
+                    <td>{{ subPlan.durations.platformFee }} %</td>
+                    <td>
+                      <button
+                        pButton
+                        (click)="toggleSubPlanList(subPlan.durations.id)"
+                      >
+                        More Actions
+                      </button>
+
+                      <ul
+                        *ngIf="visiblesubPlanDropdown === subPlan.durations.id"
+                        class="dropdown-list"
+                      >
+                        <li>
+                          <button
+                            pButton
+                            pRipple
+                            label="Edit Plan"
+                            type="button"
+                            (click)="updateCustomerSubPlan(subPlan)"
+                            class="p-button-rounded p-button-text white-space-nowrap"
+                          >
+                            <i
+                              class="pi pi-pencil mr-2"
+                              style="font-size: 1.3rem"
+                            ></i>
+                          </button>
+                        </li>
+                        <li>
+                          <button
+                            pButton
+                            pRipple
+                            label="Delete"
+                            type="button"
+                            (click)="deleteSubPlan(subPlan.durations.id)"
+                            class="p-button-rounded p-button-text white-space-nowrap"
+                          >
+                            <i class="pi pi-trash mr-2"></i>
+                          </button>
+                        </li>
+                      </ul>
+                    </td>
+                  </ng-template>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td colspan="6">
+                    There are no user linked with this device.
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+<p-toast></p-toast>

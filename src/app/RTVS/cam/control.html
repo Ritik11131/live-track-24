@@ -1,0 +1,1065 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Livetrack24 Control Test</title>
+    <script type="text/javascript" src="../../../assets/camera/CvNet.js"></script>
+
+    <style>
+        select, input {
+            width: 160px;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <h1>Playback Test</h1>
+        <div>
+            <h3>Control Parameters</h3>
+            <table style="table-layout:fixed">
+                <tr>
+                    <td>Number of Screens:</td>
+                    <td>
+                        <select id="cmbScreenNumbers" onchange="Screens(this.value)">
+                            <option value="1">1=1x1</option>
+                            <option value="2">2=1+1</option>
+                            <option value="4" selected="selected">4=2x2</option>
+                            <option value="6">6=1+5</option>
+                            <option value="8">8=1+7</option>
+                            <option value="9">9=3x3</option>
+                            <option value="10">10=1+9</option>
+                            <option value="13">13=1+12</option>
+                            <option value="16">16=4x4</option>
+                            <option value="4X3">Custom 4x3</option>
+                            <option value="3X4">Custom 3x4</option>
+                            <option value="3X2">Custom 3x2</option>
+                            <option value="2X5">Custom 2x5</option>
+                            <option value="1+1">Custom 1+1 (Top Left)</option>
+                        </select>
+                    </td>
+                    <td>Player Type:</td>
+                    <td>
+                        <select id="cmdPlayerType" onchange="PlayerChanged()">
+                            <option value="0" selected="selected">Real-time Stream Player</option>
+                            <option value="1">Historical Stream Player</option>
+                            <option value="1">Historical Stream Player</option>
+                        </select>
+                    </td>
+                    <td>Server:</td>
+                    <td>
+                        <input id="txtserveradd" value="camerawss.livetrack24.in" />
+                    </td>
+                    <td>Port:</td>
+                    <td>
+                        <input id="txtport" value="17000" />
+                    </td>
+                    <td>Protocol:</td>
+                    <td>
+                        <select id="protocol" onchange="ProtocolChange()">
+                            <option value="0" selected="selected">JT/T 808-2013</option>
+                            <option value="1">JT/T 808-2019</option>
+                            <option value="2">GB/T 28181-2016</option>
+                        </select>
+                    </td>
+                    <td>Use CDN:</td>
+                    <td>
+                        <select id="isUseCdn">
+                            <option value="true">Yes</option>
+                            <option value="false" selected="selected">No</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <h3>Command Parameters</h3>
+            <table style="table-layout:fixed">
+                <tr>
+                    <td>
+                        <button onclick="Connect(0)" disabled>Real-time Video (0x9101)</button>
+                    </td>
+                    <td>SIM Card Number:</td>
+                    <td><input id="txtsim" value="015100019985" /></td>
+                    <td>Channel:</td>
+                    <td>
+                        <select id="cmbChannel">
+                            <option value="1" selected="selected">Channel 1</option>
+                            <option value="2">Channel 2</option>
+                            <option value="3">Channel 3</option>
+                            <option value="4">Channel 4</option>
+                            <option value="5">Channel 5</option>
+                            <option value="6">Channel 6</option>
+                            <option value="7">Channel 7</option>
+                            <option value="8">Channel 8</option>
+                            <option value="33">Channel 33</option>
+                            <option value="36">Channel 36</option>
+                            <option value="99">Channel 99</option>
+                        </select>
+                        <input id="txtChannel" value="34020000001310000001" hidden />
+                    </td>
+                    <td>Stream Type:</td>
+                    <td>
+                        <select id="cmbStreamType">
+                            <option value="0">Main Stream</option>
+                            <option value="1" selected="selected">Sub Stream</option>
+                        </select>
+                    </td>
+                    <td>Media Type:</td>
+                    <td>
+                        <select id="cmbMideaType">
+                            <option value="0" selected="selected">Audio and Video</option>
+                            <option value="1">Audio</option>
+                            <option value="2">Video</option>
+                            <option value="3">Audio or Video</option>
+                        </select>
+                    </td>
+                    <td><button onclick="Snapshot()" disabled>Get Snapshot</button></td>
+                    <td><input type="checkbox" id="forceSnapshot" style="width: 20px;" />Force Snapshot Mode</td>
+                </tr>
+                <tr>
+                    <td>
+
+                        <button onclick="AVTransferControl(0)" disabled>Real-time Control (0x9102)</button>
+                    </td>
+                    <td>Control Command:</td>
+                    <td>
+                        <select id="cmbControlCommand">
+                            <option value="0" selected="selected">Close Audio and Video Transmission Command</option>
+                            <option value="1">Switch Stream (Add Pause and Continue)</option>
+                            <option value="2">Pause All Streams of This Channel</option>
+                            <option value="3">Resume Sending Streams Paused Before, Consistent with the Stream Type Before Pausing</option>
+                            <option value="4">Close Two-way Intercom</option>
+                        </select>
+                    </td>
+                    <td>Close Type:</td>
+                    <td>
+                        <select id="cmbTurnOffMediaType">
+                            <option value="0" selected="selected">Close audio and video data of this channel</option>
+                            <option value="1">Only close the audio of this channel, keep the video of this channel</option>
+                            <option value="2">Only close the video of this channel, keep the audio of this channel</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+
+            <table style="table-layout:fixed">
+                <tr>
+                    <td>
+                        <button onclick="QueryVideoFileList(0)" disabled>Query List (0x9205)</button>
+                    </td>
+                    <td>Playback Stream Type:</td>
+                    <td>
+                        <select id="cmbStreamType_back">
+                            <option value="0" selected="selected">All Streams</option>
+                            <option value="1">Main Stream</option>
+                            <option value="2">Sub Stream</option>
+                        </select>
+                    </td>
+                    <td>Start Time:</td>
+                    <td><input id="txtStarttime" value="2020-08-04 00:00:00" type="datetime" /></td>
+                    <td>End Time:</td>
+                    <td><input id="txtEndtime" value="2020-08-04 14:00:00" type="datetime" /></td>
+                    <td>Alarm Flag:</td>
+                    <td>
+                        <input id="numAlarm" value="0" type="number" />
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Storage Type:</td>
+                    <td>
+                        <select id="cmbStorageType">
+                            <option value="0">Main Storage or Disaster Recovery Storage</option>
+                            <option value="1" selected="selected">Main Storage</option>
+                            <option value="2">Disaster Recovery Storage</option>
+                        </select>
+                    </td>
+                    <td>Source:</td>
+                    <td>
+                        <select id="cmbDataSource">
+                            <option value="0" selected="selected">Default</option>
+                            <option value="1">Device</option>
+                            <option value="2">Server Cache</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr>
+
+                    <td>
+                        <button onclick="PlaybackVideo(0)" disabled>Start Playback (0x9201)</button>
+                    </td>
+
+                    <td>Playback Mode:</td>
+                    <td>
+                        <select id="cmbPlaybackMode">
+                            <option value="0" selected="selected">Normal Playback</option>
+                            <option value="1">Fast Forward Playback</option>
+                            <option value="2">Key Frame Rewind Playback</option>
+                            <option value="3">Key Frame Playback</option>
+                            <option value="4">Single Frame Upload</option>
+                        </select>
+                    </td>
+                    <td>Fast Forward or Rewind Speed:</td>
+                    <td>
+                        <select id="cmbMultiple">
+                            <option value="1" selected="selected">1x</option>
+                            <option value="2">2x</option>
+                            <option value="3">4x</option>
+                            <option value="4">8x</option>
+                            <option value="5">16x</option>
+                        </select>
+                    </td>
+                    <td colspan="2">
+                        <button onclick="StartDownload(0)" disabled>Start Download (MP4)</button>
+                        <button onclick="StartDownload(1)" disabled>Start Download (FLV)</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button onclick="PlaybackVideoControl(0)" disabled>Playback Control (0x9202)</button>
+                    </td>
+                    <td>Playback Control:</td>
+                    <td>
+                        <select id="cmbPlaybackControl">
+                            <option value="0" selected="selected">Start Playback</option>
+                            <option value="1">Pause Playback</option>
+                            <option value="2">End Playback</option>
+                            <option value="3">Fast Forward Playback</option>
+                            <option value="4">Key Frame Rewind Playback</option>
+                            <option value="5">Drag Playback</option>
+                            <option value="6">Key Frame Playback</option>
+                        </select>
+                    </td>
+                    <td>Drag Playback Position:</td>
+                    <td><input id="txtDragPlaybackPosition" value="2018-10-29 16:00:00" type="datetime" /></td>
+                </tr>
+            </table>
+            <table style="table-layout:fixed">
+                <tr>
+                    <td>
+                        <button onclick="FtpVideoFileUpload(0)" disabled>FTP Upload (0x9206)</button>
+                    </td>
+                    <td>FTP Server:</td>
+                    <td><input id="ftpAddress" value="117.74.136.34" type="text" /></td>
+                    <td>FTP Port:</td>
+                    <td><input id="ftpPort" value="21" type="number" /></td>
+                    <td>File Upload Path:</td>
+                    <td> <input id="ftpUploadPath" value="ftp://117.74.136.34/mediaFilesUpload" type="text" /></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Username:</td>
+                    <td><input id="ftpUsr" value="ftpusr" type="text" /></td>
+                    <td>Password:</td>
+                    <td><input id="ftpPwd" value="hangsheng@Ftp" type="password" /></td>
+                    <td>Execution conditions:</td>
+                    <td>
+                        <select id="taskCondition">
+                            <option value="7" selected="selected">WIFI+LAN+3G/4G</option>
+                            <option value="1">WIFI</option>
+                            <option value="2">LAN</option>
+                            <option value="4">3G/4G</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button onclick="FtpVideoFileUploadControl(0)" disabled>FTP Control (0x9207)</button>
+                    </td>
+                    <td>Response Serial Number:</td>
+                    <td><input id="cmdSerialNumber" type="number" /></td>
+                    <td>Upload Control:</td>
+                    <td>
+                        <select id="cmdUploadControl">
+                            <option value="0" selected="selected">Pause</option>
+                            <option value="1">Continue</option>
+                            <option value="2">Cancel</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+
+            <table style="table-layout:fixed">
+                <tr>
+                    <td>
+                        <button onclick="SetOsdText(0)" disabled>Set OSD Text</button>
+                    </td>
+                    <td>OSD Text:</td>
+                    <td><input id="osdtext" value="OSD Example" type="text" /></td>
+                    <td>
+                        <button onclick="SetOsdVisible(true)" disabled>Show OSD Text</button>
+                    </td>
+                    <td>
+                        <button onclick="SetOsdVisible(false)" disabled>Hide OSD Text</button>
+                    </td>
+                    <td>Priority (0-100):</td>
+                    <td><input id="prioritytext" value="1" type="text" /></td>
+                    <td>
+                        <button onclick="SetPriority()" disabled>Set Priority</button>
+                    </td>
+                </tr>
+            </table>
+
+            <table style="table-layout:fixed">
+                <tr>
+                    <td>
+                        <button onclick="SetRotate(0)" disabled>Set Rotation</button>
+                    </td>
+                    <td>Rotate Angle:</td>
+                    <td>
+                        <select id="cmbRotateAngle">
+                            <option value="0" selected="selected">0</option>
+                            <option value="90">90</option>
+                            <option value="180">180</option>
+                            <option value="270">270</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button onclick="SetMirrorInver(0)" disabled>Mirror Inversion</button>
+                    </td>
+                </tr>
+            </table>
+
+            <table style="table-layout:fixed">
+                <tr>
+                    <td>Player Type:</td>
+                    <td>
+                        <select id="cmbPlayermode">
+                            <option value="0" selected="selected">default</option>
+                            <option value="3">Soft Decode (supports 265)</option>
+                            <option value="4">fmp4</option>
+                            <option value="5">webrtc</option>
+                            <option value="6">hls</option>
+                            <option value="7">codec (requires HTTPS)</option>
+                        </select>
+                    </td>
+                    <td>Real-time Video Frame Tracking:</td>
+                    <td>
+                        <select id="seekMode">
+                            <option value="-1" selected="selected">No Frame Tracking</option>
+                            <option value="0">Jump to Latest</option>
+                            <option value="1">Speed Frame Tracking</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+
+            <table style="table-layout:fixed">
+                <tr>
+                    <td>Intercom:</td>
+                    <td>
+                        <button onclick="SpeekAudio()" disabled>Start Intercom</button>
+                        <button onclick="StopAudio()" disabled>Stop Intercom</button>
+                    </td>
+                    <td>Intercom Volume:</td>
+                    <td>
+                        <select id="speakVolume" onchange="SpeakVolumeChange()">
+                            <option value="0.0">0.0</option>
+                            <option value="0.1">0.1</option>
+                            <option value="0.2">0.2</option>
+                            <option value="0.3">0.3</option>
+                            <option value="0.4">0.4</option>
+                            <option value="0.5">0.5</option>
+                            <option value="0.6">0.6</option>
+                            <option value="0.7">0.7</option>
+                            <option value="0.8">0.8</option>
+                            <option value="0.9">0.9</option>
+                            <option value="1.0" selected="selected">1.0</option>
+                            <option value="1.5">1.5</option>
+                            <option value="2.0">2.0</option>
+                            <option value="3.0">3.0</option>
+                            <option value="5.0">5.0</option>
+                            <option value="10.0">10.0</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+
+            <table style="table-layout:fixed">
+                <tr>
+                    <td>
+                        <button onclick="GovPlay(0)" disabled>Play 1078 HTTP (For Government Platform)</button>
+                    </td>
+                    <td>Gov URL:</td>
+                    <td><input id="txtgov" value="http://et.test.cvtsp.com:15007/沪QQ7777.1.1.0.aaa" style="width: 800px;" /></td>
+                </tr>
+            </table>
+
+
+        </div>
+        <div id="btns">
+            <div>
+                <h3>Control</h3>
+                <button onclick="Close(0)" disabled>Close Selected Video</button>
+                <button onclick="Close(-1)" disabled>Close All Videos</button>
+                <button onclick="FullScreen()" disabled>Full Screen</button>
+            </div>
+            <div id="playbackbyday" style="display:none">
+                <h3>Playback by Day</h3>
+                Playback Date:<input id="txtPlayBackDatetime" value="2019-03-06" type="datetime" />
+                <button onclick="StartBackVideo(0)" disabled>Show Playable Videos of the Day</button>
+            </div>
+            <div id="player" style="width:1200px;height:982px;background:rgb(0, 0, 0);">
+            </div>
+            <div id="videoFileList" style="height:auto;width:100%;"></div>
+        </div>
+    </div>
+    <script>
+
+        window.onload = function () {
+            console.log(CvNetVideo.version);
+            init();
+
+            var now = new Date();
+            document.getElementById("txtPlayBackDatetime").value = now.toLocaleDateString().split('/').join('-');
+
+
+            document.getElementById("txtStarttime").value = GetDateStr(now, -60 * 60);
+
+            document.getElementById("txtDragPlaybackPosition").value = GetDateStr(now, -55 * 60);
+
+            document.getElementById("txtEndtime").value = GetDateStr(now, -57 * 60);
+
+
+        };
+        function GetDateStr(date, addsec) {
+            var sd = new Date(date.getTime() + 1000 * addsec);
+            return sd.toLocaleDateString().split('/').join('-') + " " + sd.getHours() + ":" + sd.getMinutes() + ":00";
+
+        }
+
+
+        function WindowResize() {
+            let isFullscreen = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
+            if (!isFullscreen) {
+                var width = document.body.clientWidth - 10;
+                var height = width * 2 / 3;
+                document.getElementById("player").style.width = width + 'px';
+                document.getElementById("player").style.height = height + 'px';
+                CvNetVideo.Resize(width, height);
+            }
+        }
+
+        window.addEventListener("resize", WindowResize);
+
+        function PlayerChanged() {
+            if (document.querySelector('#cmdPlayerType').value == "0") {
+                CvNetVideo.SetRealOrBack(true);
+                document.querySelector("#playbackbyday").style.display = "none";
+            } else {
+                CvNetVideo.SetRealOrBack(false);
+                document.querySelector("#playbackbyday").style.display = "";
+            }
+        }
+        function ProtocolChange() {
+            if (document.querySelector('#protocol').value == 2) {
+                document.querySelector('#cmbChannel').hidden = true;
+                document.querySelector('#txtChannel').hidden = false;
+            } else {
+                document.querySelector('#cmbChannel').hidden = false;
+                document.querySelector('#txtChannel').hidden = true;
+            }
+        }
+        function GetChannel() {
+
+            if (document.querySelector('#protocol').value == 2)
+                return document.querySelector('#txtChannel').value;
+            else
+                return parseInt(document.querySelector('#cmbChannel').value);
+        }
+
+
+        function CvNetVideoSelectedEventCallback(id) {
+            var selected = id;
+        }
+
+        var oldTitle = document.title;
+        function timeoutWarning(leftMsec, time) {
+            //leftMsec remaining milliseconds before closing
+            //time     last action time
+            //leftMsec remaining milliseconds before closing
+            document.title = leftMsec / 1000 + ' seconds before automatic closure';
+        }
+        //time     last action time
+        function timeoutClose(time) {
+            Close(-1);
+            alert('No operation for a long time, automatically closed!');
+            document.title = oldTitle;
+        }
+        function timeoutCanceled() {
+            document.title = oldTitle;
+        }
+        function onVideoStop(id, ucVideo) {
+            //alert(id + 'Screen closed!');
+        }
+        function onServerNotice(type, id, ucVideo) {
+            console.log("event:" + type + " videoid:" + id);
+        }
+        function onEndByServer(msg, id, ucVideo) {
+            alert(id + " screen playback ended, reason: " + msg);
+        }
+        function onCapture(base64png, id, ucVideo) {
+            console.log(id + " split screen snapshot sim:" + ucVideo.Sim + " Channel:" + ucVideo.Channel);
+            //console.log(base64png);
+        }
+        function onHlsPlay(id, ucVideo, hlshttp, hlshttps, rtmpurl, cid, flvhttp, flvhttps) {
+            console.log(id, hlshttp, hlshttps, rtmpurl, cid, flvhttp, flvhttps);
+        }
+        function onChangeH265Player(playermode) {
+            console.log("Current mode " + playermode + " does not support H265, automatically switching to software decode mode");
+        }
+        // Split screen callback
+        function Split3X2(width, height) {
+            uc1.SplitXY(width, height, 3, 2)
+            return;
+
+            uc1.Container.style.width = width - parseInt((width - uc1.m_border * 4) % 3) + "px";
+            uc1.Container.style.height = height - parseInt((height - uc1.m_border * 3) % 2) + "px";
+
+            width = parseInt((width - uc1.m_border * 4) / 3);
+            height = parseInt((height - uc1.m_border * 3) / 2);
+            uc1.VideosforEach(function (video, i) {
+                var video_div = video.GetVideoDiv();
+                if (i > 6) {
+                    // Hide exceeding split screen quantity
+                    video_div.style.display = "none";
+                } else {
+                    //Calculate the current split screen position
+                    video_div.style.display = "block";
+                    let index = i - 1;
+                    let left = (index % 3) * (width + CvNetVideo.m_border);
+                    let top = parseInt(index / 3) * (height + CvNetVideo.m_border);
+                    video_div.style.left = left + "px";
+                    video_div.style.top = top + "px";
+
+                    video_div.style.width = width + "px";
+                    video_div.style.height = height + "px";
+                    video.Resize();
+                }
+            });
+        }
+        function Split2(width, height) {
+            uc1.SelectChangeZIndex = false;
+
+            uc1.Container.style.width = width + "px";
+            uc1.Container.style.height = height + "px";
+
+            width = width - uc1.m_border * 2;
+            height = height - uc1.m_border * 2;
+
+            uc1.VideosforEach(function (video, i) {
+                var video_div = video.GetVideoDiv();
+                if (i > 2) {
+                    video_div.style.display = "none";
+                } else if (i == 1) {
+                    video_div.style.display = "block";
+
+                    video_div.style.left = "0px";
+                    video_div.style.top = "0px";
+                    video_div.style.width = width + "px";
+                    video_div.style.height = height + "px";
+                    video_div.style.zIndex = i;
+                    video.Resize();
+                } else if (i == 2) {
+                    video_div.style.display = "block";
+
+                    let w = parseInt(width / 3);
+                    let h = parseInt(height / 3);
+
+                    video_div.style.left = "5px";
+                    video_div.style.top = "5px";
+                    video_div.style.width = w + "px";
+                    video_div.style.height = h + "px";
+                    video_div.style.zIndex = i;
+                    video.Resize();
+                }
+            });
+        }
+        var uc1;
+        function init() {
+            uc1 = CvNetVideo.Init(document.querySelector("#player"), document.querySelector("#cmbScreenNumbers").value,
+                {
+                    callback: function () {
+                        [].forEach.call(document.querySelectorAll("button"), function (btn) {
+                            btn.disabled = false;
+                        });
+                    },
+                    selectedEvent: function (e) {
+                        var selected = e;
+                    },
+                    //Event Notification
+                    events: {
+                        //Screenshot event
+                        onCapture: onCapture,
+                        //Timeout warning notification
+                        timeoutWarning: timeoutWarning,
+                        //Timeout warning canceled
+                        timeoutCanceled: timeoutCanceled,
+                        //Timeout notification
+                        timeoutClose: timeoutClose,
+                        //Stop playback notification
+                        onStop: onVideoStop,
+                        //Server Notification
+                        onServerNotice: onServerNotice,
+                        //Notification of playback ended by server
+                        onEndByServer: onEndByServer,
+                        //Notification before HLS mode playback, can get RTMP, HLS, etc. URLs
+                        onHlsPlay: onHlsPlay,
+                        //Current mode does not support H265 notification
+                        onChangeH265Player: onChangeH265Player
+                    }
+                });
+
+            // Custom split screen
+            // Parameter 1 is the split screen key, corresponding to the CvNetVideo.LayoutByScreens parameter. Do not use numeric values to avoid conflicts with default split screens.
+            // Parameter 2 is the split screen calculation callback
+            CvNetVideo.CustomScreens("3X2", Split3X2);
+            CvNetVideo.CustomScreens("1+1", Split2);
+            CvNetVideo.CustomScreens("4X3", function (width, height) {
+                uc1.SplitXY(width, height, 4, 3)
+            });
+            CvNetVideo.CustomScreens("3X4", function (width, height) {
+                uc1.SplitXY(width, height, 3, 4)
+            });
+            CvNetVideo.CustomScreens("2X5", function (width, height) {
+                uc1.SplitXY(width, height, 2, 5)
+            });
+
+
+
+            //CvNetVideo.SetRealOrBack(false);
+            //CvNetVideo.SetBackDateTime(
+            //    document.querySelector('#txtsim').value,
+            //    GetChannel(),
+            //    "2019-03-06",
+            //    1,
+            //    document.querySelector('#numAlarm').value,
+            //    parseInt(document.querySelector('#cmbMideaType').value),
+            //    parseInt(document.querySelector('#cmbStreamType').value),
+            //    parseInt(document.querySelector('#cmbStorageType').value),
+            //    {
+            //         clusterHost: document.querySelector("#txtserveradd").value,
+            //         clusterPort: document.querySelector("#txtport").value
+            //
+            //    });
+        }
+
+        function changeControls(controls) {
+            document.querySelectorAll("video").forEach((p) => { p.controls = true; });
+        }
+        function GovPlay(id) {
+
+            CvNetVideo.GovPlay(
+                document.querySelector('#txtgov').value,
+                id,
+                {
+                    protocol: document.querySelector("#protocol").value,
+                    seekMode: -1,
+                },
+                //gov real-time stream request callback, status < 0 request failed, reason reason
+                function (status, reason) {
+                    if (status < 0) {
+                        console.log("Failed: " + reason);
+                        if (status == -1) {
+                            alert("An error occurred while requesting the URL. Please check if the URL is accessible or if an HTTP address was accessed through an HTTPS page.");
+                        } else {
+                            alert(reason);
+                        }
+                    }
+                },
+            );
+        }
+        // Real-time stream
+        function Connect(id) {
+            var mideaType;
+            if (document.querySelector('#cmbMideaType').value == 1) {
+                mideaType = 203;
+            } else if (document.querySelector('#cmbMideaType').value == 0) {
+                mideaType = true;
+            } else {
+                mideaType = false;
+            }
+            CvNetVideo.StartRealTimeVideo(
+                document.querySelector('#txtsim').value,
+                GetChannel(),
+                parseInt(document.querySelector('#cmbStreamType').value),
+                mideaType,
+                id,
+                {
+                    clusterHost: document.querySelector("#txtserveradd").value,
+                    clusterPort: document.querySelector("#txtport").value,
+                    seekMode: document.querySelector("#seekMode").value,
+                    protocol: document.querySelector("#protocol").value,
+                    isUseCdn: document.querySelector("#isUseCdn").value === 'true'
+                },
+                null,
+                parseInt(document.querySelector('#cmbPlayermode').value)
+            );
+        }
+        //Start History
+        function StartBackVideo(id) {
+
+            CvNetVideo.SetBackDateTime(
+                document.querySelector('#txtsim').value,
+                GetChannel(),
+                document.querySelector('#txtPlayBackDatetime').value,
+                id,
+                document.querySelector('#numAlarm').value,
+                parseInt(document.querySelector('#cmbMideaType').value),
+                parseInt(document.querySelector('#cmbStreamType_back').value),
+                parseInt(document.querySelector('#cmbStorageType').value),
+                {
+                    clusterHost: document.querySelector("#txtserveradd").value,
+                    clusterPort: document.querySelector("#txtport").value,
+                    protocol: document.querySelector("#protocol").value,
+                    isUseCdn: document.querySelector("#isUseCdn").value === 'true'
+                },
+                parseInt(document.querySelector('#cmbDataSource').value)
+            );
+        }
+        function Snapshot() {
+            CvNetVideo.Snapshot(
+                document.querySelector('#txtsim').value,
+                GetChannel(),
+                document.querySelector('#forceSnapshot').checked,
+                function (is_success, url, reason) {
+                    console.log("is_success:" + is_success + " url:" + url + " reason:" + reason)
+                },
+                {
+                    clusterHost: document.querySelector("#txtserveradd").value,
+                    clusterPort: document.querySelector("#txtport").value,
+                    protocol: document.querySelector("#protocol").value,
+                    isUseCdn: document.querySelector("#isUseCdn").value === 'true'
+                },
+            );
+        }
+        function AVTransferControl(id) {
+            CvNetVideo.AVTransferControl(
+                document.querySelector('#txtsim').value,
+                GetChannel(),
+                parseInt(document.querySelector('#cmbControlCommand').value),
+                parseInt(document.querySelector('#cmbStreamType').value),
+                parseInt(document.querySelector('#cmbTurnOffMediaType').value),
+                id,
+                {
+                    clusterHost: document.querySelector("#txtserveradd").value,
+                    clusterPort: document.querySelector("#txtport").value,
+                    protocol: document.querySelector("#protocol").value
+
+                }
+            );
+        }
+        function StartDownload(videoFormat) {
+
+            CvNetVideo.DownLoadVideo(
+                document.querySelector('#txtsim').value,
+                GetChannel(),
+                parseInt(document.querySelector('#cmbMideaType').value),
+                parseInt(document.querySelector('#cmbStreamType_back').value),
+                parseInt(document.querySelector('#cmbStorageType').value),
+                parseInt(document.querySelector('#cmbPlaybackMode').value),
+                parseInt(document.querySelector('#cmbMultiple').value),
+                document.querySelector('#txtStarttime').value,
+                document.querySelector('#txtEndtime').value,
+                {
+                    clusterHost: document.querySelector("#txtserveradd").value,
+                    clusterPort: document.querySelector("#txtport").value,
+                    protocol: document.querySelector("#protocol").value,
+                    isUseCdn: document.querySelector("#isUseCdn").value === 'true'
+                },
+                parseInt(document.querySelector('#cmbDataSource').value),
+                4,
+                videoFormat
+            )
+        }
+        function PlaybackVideo(id) {
+
+            CvNetVideo.PlaybackVideo(
+                document.querySelector('#txtsim').value,
+                GetChannel(),
+                parseInt(document.querySelector('#cmbMideaType').value),
+                parseInt(document.querySelector('#cmbStreamType_back').value),
+                parseInt(document.querySelector('#cmbStorageType').value),
+                parseInt(document.querySelector('#cmbPlaybackMode').value),
+                parseInt(document.querySelector('#cmbMultiple').value),
+                document.querySelector('#txtStarttime').value,
+                document.querySelector('#txtEndtime').value,
+                id,
+                {
+                    clusterHost: document.querySelector("#txtserveradd").value,
+                    clusterPort: document.querySelector("#txtport").value,
+                    protocol: document.querySelector("#protocol").value,
+                    isUseCdn: document.querySelector("#isUseCdn").value === 'true'
+                },
+                null,
+                parseInt(document.querySelector('#cmbPlayermode').value),
+                parseInt(document.querySelector('#cmbDataSource').value)
+            )
+        }
+        function PlaybackVideoControl(id) {
+            CvNetVideo.PlaybackVideoControl(
+                document.querySelector('#txtsim').value,
+                GetChannel(),
+                parseInt(document.querySelector('#cmbPlaybackControl').value),
+                parseInt(document.querySelector('#cmbMultiple').value),
+                document.querySelector('#txtDragPlaybackPosition').value,
+                id,
+                {
+                    clusterHost: document.querySelector("#txtserveradd").value,
+                    clusterPort: document.querySelector("#txtport").value,
+                    protocol: document.querySelector("#protocol").value
+
+                }
+            );
+        }
+        function QueryVideoFileList(id) {
+            CvNetVideo.QueryVideoFileList(
+                document.querySelector('#txtsim').value,
+                GetChannel(),
+                DateToUnixLong(document.querySelector('#txtStarttime').value),
+                DateToUnixLong(document.querySelector('#txtEndtime').value),
+                document.querySelector('#numAlarm').value,
+                parseInt(document.querySelector('#cmbMideaType').value),
+                parseInt(document.querySelector('#cmbStreamType_back').value),
+                parseInt(document.querySelector('#cmbStorageType').value),
+                QueryVideoFileListCallback,
+                id,
+                {
+                    clusterHost: document.querySelector("#txtserveradd").value,
+                    clusterPort: document.querySelector("#txtport").value,
+                    protocol: document.querySelector("#protocol").value
+                },
+                parseInt(document.querySelector('#cmbDataSource').value)
+            );
+        }
+        function QueryVideoFileListCallback(data) {
+            alert("Query audio and video file list successfully!");
+            // Fill HTML to display data
+            FillDataToShow(data);
+            // Scroll the page to the specified position
+            document.querySelector("#videoFileList").scrollIntoView();
+        }
+        function FillDataToShow(data) {
+            var div = document.getElementById("videoFileList");
+            div.innerHTML = "";
+            var p = document.createElement("p");
+            p.innerHTML = "<h2 align='left'>Audio and Video Query Result Information:<h2>";
+            div.appendChild(p);
+            var p_total = document.createElement("p");
+            p_total.innerHTML = "Serial Number:" + data.SerialNumber + "\t File Count:" + data.FileCount + "\tNumber of Files in Collection:" + data.FileList.length;
+            div.appendChild(p_total);
+            // Define table and headers
+            var table = document.createElement("table");
+            table.border = "1px";
+            var tr = document.createElement("tr");
+            var td1 = document.createElement("th");
+            td1.innerText = "Channel Number";
+            var td2 = document.createElement("th");
+            td2.innerText = "Start Time";
+            var td3 = document.createElement("th");
+            td3.innerText = "End Time";
+            var td4 = document.createElement("th");
+            td4.innerText = "Alarm Type";
+            var td5 = document.createElement("th");
+            td5.innerText = "Media Type";
+            var td6 = document.createElement("th");
+            td6.innerText = "Stream Type";
+            var td7 = document.createElement("th");
+            td7.innerText = "Storage Type";
+            var td8 = document.createElement("th");
+            td8.innerText = "File Size";
+            var td9 = document.createElement("th");
+            td9.innerText = "Action";
+            tr.appendChild(td1);
+            tr.appendChild(td2);
+            tr.appendChild(td3);
+            tr.appendChild(td4);
+            tr.appendChild(td5);
+            tr.appendChild(td6);
+            tr.appendChild(td7);
+            tr.appendChild(td8);
+            tr.appendChild(td9);
+            table.appendChild(tr);
+            // Traverse file information
+            if (data.FileList.length > 0) {
+                for (var i = 0, j = data.FileList.length; i < j; i++) {
+                    var item = data.FileList[i];
+                    var tr = document.createElement("tr");
+                    var td1 = document.createElement("td");
+                    td1.innerText = item.Channel;
+                    var td2 = document.createElement("td");
+                    td2.innerText = item.StartTime;
+                    var td3 = document.createElement("td");
+                    td3.innerText = item.EndTime;
+                    var td4 = document.createElement("td");
+                    td4.innerText = item.Alarm;
+                    var td5 = document.createElement("td");
+                    td5.innerText = item.MediaType;
+                    var td6 = document.createElement("td");
+                    td6.innerText = item.StreamType;
+                    var td7 = document.createElement("td");
+                    td7.innerText = item.StorageType;
+                    var td8 = document.createElement("td");
+                    td8.innerText = item.FileSize;
+                    var td9 = document.createElement("td");
+                    var aaa = document.createElement("a");
+                    aaa.href = "javascript:CvNetVideo.PlaybackVideo(document.querySelector('#txtsim').value,"
+                        + item.Channel + ","
+                        + item.MediaType + ","
+                        + item.StreamType + ","
+                        + item.StorageType + ","
+                        + "parseInt(document.querySelector('#cmbPlaybackMode').value),parseInt(document.querySelector('#cmbMultiple').value),"
+                        + "Time1078ToTime('" + item.StartTime + "'),"
+                        + "Time1078ToTime('" + item.EndTime + "'),0,"
+                        + "{clusterHost: document.querySelector('#txtserveradd').value,clusterPort: document.querySelector('#txtport').value,protocol: document.querySelector('#protocol').value,isUseCdn: document.querySelector('#isUseCdn').value === 'true'},null,parseInt(document.querySelector('#cmbPlayermode').value),parseInt(document.querySelector('#cmbDataSource').value))";
+                    aaa.innerText = "播放";
+                    td9.appendChild(aaa);
+                    tr.appendChild(td1);
+                    tr.appendChild(td2);
+                    tr.appendChild(td3);
+                    tr.appendChild(td4);
+                    tr.appendChild(td5);
+                    tr.appendChild(td6);
+                    tr.appendChild(td7);
+                    tr.appendChild(td8);
+                    tr.appendChild(td9);
+                    table.appendChild(tr);
+                }
+                table.style.color = "green";
+            } else {
+                var tr = document.createElement("tr");
+                var td = document.createElement("td");
+                td.innerText = "The FileList collection data is empty, unable to traverse the corresponding list data!";
+                td.setAttribute("colspan", 8);
+                tr.appendChild(td);
+                table.appendChild(tr);
+                table.style.color = "red";
+            }
+            div.appendChild(table);
+        }
+        function Time1078ToTime(time1078) {
+            return ParseDate("20" + time1078.substring(0, 2) + "-" + time1078.substring(2, 4) + "-" + time1078.substring(4, 6)
+                + " " + time1078.substring(6, 8) + ":" + time1078.substring(8, 10) + ":" + time1078.substring(10, 12));
+        }
+        function FtpVideoFileUpload(id) {
+            CvNetVideo.FtpVideoFileUpload(
+                document.querySelector('#txtsim').value,
+                GetChannel(),
+                document.querySelector('#ftpAddress').value,
+                parseInt(document.querySelector('#ftpPort').value),
+                document.querySelector('#ftpUsr').value,
+                document.querySelector('#ftpPwd').value,
+                document.querySelector('#ftpUploadPath').value,
+                ParseDate(document.querySelector('#txtStarttime').value),
+                ParseDate(document.querySelector('#txtEndtime').value),
+                document.querySelector('#numAlarm').value,
+                parseInt(document.querySelector('#cmbMideaType').value),
+                parseInt(document.querySelector('#cmbStreamType_back').value),
+                parseInt(document.querySelector('#cmbStorageType').value),
+                parseInt(document.querySelector("#taskCondition").value),
+                FtpVideoFileUploadCallback,
+                id,
+                {
+                    clusterHost: document.querySelector("#txtserveradd").value,
+                    clusterPort: document.querySelector("#txtport").value,
+                    protocol: document.querySelector("#protocol").value
+                }
+            );
+        }
+        function FtpVideoFileUploadCallback(data) {
+            if (data.Result === 0) {
+                document.getElementById("cmdSerialNumber").value = data.SerialNumber;
+                alert("FTP upload successful (SerialNumber=" + data.SerialNumber + ")!");
+            } else if (data.Result === 1) {
+                alert("FTP upload failed!");
+            }
+            if (data.Result === 2) {
+                document.getElementById("cmdSerialNumber").value = data.SerialNumber;
+                alert("FTP upload command issued successfully (SerialNumber=" + data.SerialNumber + ")!");
+            }
+
+        }
+        function FtpVideoFileUploadControl(id) {
+            CvNetVideo.FtpVideoFileUploadControl(
+                document.querySelector('#txtsim').value,
+                parseInt(document.querySelector('#cmdSerialNumber').value),
+                parseInt(document.querySelector('#cmdUploadControl').value),
+                id,
+                {
+                    clusterHost: document.querySelector("#txtserveradd").value,
+                    clusterPort: document.querySelector("#txtport").value,
+                    protocol: document.querySelector("#protocol").value
+
+                }
+            );
+        }
+        function SetOsdText(id) {
+            CvNetVideo.SetOsdColor("#00ff00", id);
+            CvNetVideo.SetOsdText(id, document.querySelector('#osdtext').value);
+        }
+        function SetRotate(id) {
+            CvNetVideo.SetRotate(id, document.querySelector('#cmbRotateAngle').value);
+        }
+        function SetMirrorInver(id) {
+            CvNetVideo.SetMirrorInver(id);
+        }
+
+        function SetOsdVisible(is_visible) {
+            CvNetVideo.SetOsdVisible(is_visible, 0);
+        }
+
+        function SetPriority() {
+            CvNetVideo.SetPriority(parseInt(document.querySelector('#prioritytext').value))
+        }
+
+        function Close(id) {
+            CvNetVideo.Stop(id);
+        }
+        function FullScreen() {
+            CvNetVideo.FullScreen();
+        }
+        function Screens(num) {
+            CvNetVideo.LayoutByScreens(num);
+        }
+
+        function ParseDate(date) {
+            var t = Date.parse(date);
+            if (isNaN(t)) {
+                return new Date(Date.parse(date.replace(/-/g, "/")));
+            } else {
+                return new Date(t);
+            }
+        }
+
+        function DateToUnixLong(date) {
+            return Date.parse(ParseDate(date)) / 1000;
+        }
+
+        function SpeekAudio() {
+            let ret = CvNetVideo.StartSpeek(
+                document.querySelector('#txtsim').value,
+                GetChannel(),
+                {
+                    clusterHost: document.querySelector("#txtserveradd").value,
+                    clusterPort: document.querySelector("#txtport").value,
+                    protocol: document.querySelector("#protocol").value,
+                    isUseCdn: document.querySelector("#isUseCdn").value === 'true'
+                }
+            );
+            if (!ret) {
+                alert("Failed to get the microphone, please make sure the current page is https and not blocked.");
+            }
+        }
+
+        function StopAudio() {
+            CvNetVideo.StopSpeak();
+        }
+
+        function SpeakVolumeChange() {
+            CvNetVideo.SetSpeekVolume(document.querySelector('#speakVolume').value);
+        }
+    </script>
+
+</body>
+</html>

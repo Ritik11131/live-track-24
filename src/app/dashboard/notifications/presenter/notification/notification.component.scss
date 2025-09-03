@@ -1,0 +1,25 @@
+.container {
+    position: relative;
+    overflow: hidden;
+    transition: width 0.3s ease;
+  }
+  
+  .div1, .div2 {
+    float: left;
+    width: 50%;
+  }
+  
+  .hide-div1 {
+    width: 0;
+  }
+  
+  .hide-div2 {
+    width: 100%;
+  }
+  ::ng-deep .p-dropdown .p-dropdown-label {
+    font-size: 13px !important; /* Override the label font size */
+    }
+    
+    ::ng-deep .p-dropdown .p-dropdown-items .p-dropdown-item {
+    font-size: 13px !important; /* Override the item font size */
+    }

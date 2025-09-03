@@ -1,0 +1,40 @@
+<div
+  class="absolute top-0 bottom-0 left-0 right-0 flex justify-content-center align-items-center"
+  style="background-color: rgba(0, 0, 0, 0.5); z-index: 3000"
+>
+  <div class="bg-white border-round-xl flex flex-column p-4  gap-3">
+    
+    <div class="flex justify-content-center align-items-center">
+      <img src={{illustration}} class="h-15rem">
+    </div>
+    <div>
+      <p class="text-2xl font-bold white-space-nowrap   ">{{ title }}</p>
+    </div>
+
+    
+    <div class="flex flex justify-content-center gap-4">
+      <button
+      pButton
+        label="{{ buttonOneValue }}"
+        (click)="onConfirm()"
+        style="background-color: #22c55e"
+        class="white-space-nowrap text-xl"
+      ></button>
+      <button
+      pButton *ngIf="buttonOneValue!=='Boot Unlock'"
+        label="{{ buttonTwoValue }}"
+        (click)="offConfirm()"
+        class="white-space-nowrap text-xl"
+        style="background-color: #ef4444"
+        ></button>
+      <button
+      pButton
+        label="Cancel"
+        class="white-space-nowrap text-xl"
+        (click)="onCancel()"
+        style="background-color: #1797B0"
+
+      ></button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,49 @@
+<div
+  class="flex flex-column align-items-center justify-content-center h-screen w-screen absolute top-0 left-0"
+  style="z-index: 3000; background-color: rgba(0, 0, 0, 0.6)"
+>
+  <div
+    class="flex flex-column bg-gray-100 xl:w-3 md:w-4 sm:w-6 w-9 p-4 border-round-3xl gap-3"
+  >
+    <p class="text-2xl font-bold">Set the Recharge Expire Date</p>
+    <div class="flex flex-column gap-2">
+        <label>Vehicle Id</label>
+
+        <input type="text"         class=" w-full text-xl"
+        pInputText [(ngModel)]="deviceId" />
+        <label>Recharge Due Date </label>
+
+      <p-calendar
+        [style]="{ width: '100%' }"
+        [(ngModel)]="date"
+        class="cursor-pointer"
+        class="text-xl"
+      ></p-calendar>
+    </div>
+
+   
+
+     
+
+
+    <div class="flex flex-row justify-content-start gap-4">
+      <button
+      pButton
+        label="Submit"
+        style="background-color: #22c55e"
+        class="  white-space-nowrap  cursor-pointer text-xl"
+
+        (click)="submit()"
+      ></button>
+      <button
+      pButton
+        (click)="closeDialogBox()"
+        label="Cancel"
+        class="  white-space-nowrap  cursor-pointer text-xl"
+
+        style="background-color: #1797B0"
+      ></button>
+
+    </div>
+  </div>
+</div>

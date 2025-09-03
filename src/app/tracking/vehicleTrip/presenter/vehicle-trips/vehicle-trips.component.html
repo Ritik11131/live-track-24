@@ -1,0 +1,117 @@
+<div
+        class="flex p-4 flex-column gap-2"
+        style="max-height: 65vh; overflow: auto"
+>
+    <ng-container *ngIf="tripReportLoading; else content">
+        <!-- Skeleton Loading Template -->
+        <div
+                class="flex flex-column p-3 border-round-2xl bg-gray-100 shadow-2 gap-2"
+        >
+            <div class="flex flex-row justify-content-between align-items-center">
+                <div class="flex justify-content-start font-semibold">
+                    <p-skeleton></p-skeleton>
+                </div>
+                <div
+                        class="flex justify-content-center align-items-center border-circle p-2"
+                        style="background-color: #41afaf"
+                >
+                    <i class="pi pi-caret-right" style="color: white"></i>
+                </div>
+            </div>
+
+            <div class="flex flex-row justify-content-center gap-1 w-5">
+                <div class="w-full">Start Time</div>
+                <div class="w-full font-semibold text-green-500">
+                    <p-skeleton></p-skeleton>
+                </div>
+            </div>
+
+            <div>
+                <p-skeleton></p-skeleton>
+            </div>
+
+            <div class="flex flex-row justify-content-center gap-1 w-5">
+                <div class="w-full">End Time</div>
+                <div class="w-full font-semibold text-red-500">
+                    <p-skeleton></p-skeleton>
+                </div>
+            </div>
+
+            <div>
+                <p-skeleton></p-skeleton>
+            </div>
+            <div class="flex flex-row justify-content-between">
+                <div class="flex flex-column justify-content-between">
+                    <div>Duration</div>
+                    <div class="font-semibold"><p-skeleton></p-skeleton></div>
+                </div>
+                <div class="flex flex-column justify-content-between">
+                    <div>Distance</div>
+                    <div class="font-semibold"><p-skeleton></p-skeleton></div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+    <ng-template #content>
+        <!-- Actual Content Template -->
+        <ng-container *ngIf="tripReport.length > 0; else noRecords">
+            <div         class="flex line-height-3 flex-column p-3 font-bold border-round-2xl bg-gray-300 shadow-2 gap-2"
+            >Total Trip Distance : {{totalTripDistance.toFixed(2)}}km</div>
+            <div
+                    *ngFor="let trip of tripReport"
+                    class="flex line-height-3 flex-column p-3 border-round-2xl bg-gray-100 shadow-2 gap-2"
+            >
+                <div class="flex flex-row justify-content-between align-items-center">
+                    <div class="flex text-lg justify-content-start font-semibold">
+                        {{ trip.tripStartTime | date : "MMM dd, yyyy" }}
+                    </div>
+                </div>
+
+                <div class="flex flex-row justify-content-center gap-1 w-5">
+                    <div class="w-full text-lg">Start Time</div>
+                    <div class="w-full font-semibold text-lg text-green-500">
+                        {{ trip.tripStartTime | date : "HH:mm:ss" }}
+                    </div>
+                </div>
+
+                <div class="text-lg">
+                    {{ trip.startAddress }}
+                </div>
+
+                <div class="flex flex-row justify-content-center gap-1 w-5">
+                    <div class="w-full text-lg">End Time</div>
+                    <div class="w-full text-lg font-semibold text-red-500">
+                        {{ trip.tripEndTime | date : "HH:mm:ss" }}
+                    </div>
+                </div>
+
+                <div class="text-lg">
+                    {{ trip.endAddress }}
+                </div>
+                <div class="flex flex-row justify-content-between">
+                    <div class="flex flex-column justify-content-between">
+                        <div class="text-lg">Duration</div>
+                        <div class="font-semibold text-lg">{{ trip.duration }}</div>
+                    </div>
+                    <div class="flex flex-column justify-content-between">
+                        <div class="text-lg">Distance</div>
+                        <div class="font-semibold text-lg">{{ trip.distance }} Km</div>
+                    </div>
+                    <p-button
+                            [rounded]="true"
+                            [style]="{'background-color': '#1797B0'}"
+                            (click)="showTripOnMap(trip.tripStartTime, trip.tripEndTime)"
+                            class="flex justify-content-center align-items-center border-circle p-2"
+                            icon="pi pi-caret-right"
+                    >
+                    </p-button>
+                </div>
+            </div>
+        </ng-container>
+        <ng-template #noRecords>
+            <div class="flex justify-content-center align-items-center text-center">
+                No records found For Today
+            </div>
+        </ng-template>
+    </ng-template>
+</div>

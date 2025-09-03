@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Video Control</title>
+    <script src="../../../assets/camera/CvNet.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 0;
+        }
+
+        .video-container {
+            width: 100%;
+            background: black;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+        }
+
+        .status {
+            padding: 8px;
+            margin: 8px 0;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .status.error {
+            background: #ffebee;
+            color: #c62828;
+            display: block;
+        }
+
+        .status.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div id="statusMessage" class="status"></div>
+    <div class="video-container" id="player"></div>
+
+    <script>
+        let videoPlayer;
+        let currentStreamId = 0;
+        let isInitialized = false;
+        
+        // Create a global object to expose to Android
+        window.VideoInterface = {
+            isReady: false,
+            
+            initializePlayer: function(serverAddress, serverPort, simNumber, channel, streamType, layout) {
+                try {
+                    videoPlayer = CvNetVideo.Init(
+                        document.getElementById("player"),
+                        layout,
+                        {
+                            selectedEvent: function(id) {
+                                currentStreamId = id;
+                            },
+                            events: {
+                                onCapture: function(base64png, id) {
+                                    Android.onSnapshotTaken(base64png);
+                                },
+                                onStop: function(id) {
+                                    Android.onStreamStopped();
+                                },
+                                onServerNotice: function(type, id) {
+                                    Android.onServerNotice(type, id);
+                                },
+                                onEndByServer: function(msg, id) {
+                                    Android.onStreamEndedByServer(msg);
+                                }
+                            }
+                        }
+                    );
+                    
+                    this.config = {
+                        clusterHost: serverAddress,
+                        clusterPort: serverPort,
+                        protocol: 0,
+                        isUseCdn: false,
+                        seekMode: -1
+                    };
+                    
+                    this.streamSettings = {
+                        simNumber: simNumber,
+                        channel: parseInt(channel),
+                        streamType: parseInt(streamType)
+                    };
+                    
+                    this.isReady = true;
+                    isInitialized = true;
+                    Android.onInterfaceReady();
+                    return true;
+                } catch (error) {
+                    Android.onError('Init failed: ' + error.message);
+                    return false;
+                }
+            },
+            
+            startStream: function() {
+                if (!this.isReady) {
+                    Android.onError('Interface not ready');
+                    return;
+                }
+                try {
+                    CvNetVideo.StartRealTimeVideo(
+                        this.streamSettings.simNumber,
+                        this.streamSettings.channel,
+                        this.streamSettings.streamType,
+                        true,
+                        currentStreamId,
+                        this.config,
+                        function(status, reason) {
+                            if (status < 0) {
+                                Android.onError('Stream start failed: ' + reason);
+                            } else {
+                                Android.onStreamStarted();
+                            }
+                        }
+                    );
+                } catch (error) {
+                    Android.onError('Start stream failed: ' + error.message);
+                }
+            },
+            
+            stopStream: function() {
+                if (!this.isReady) return;
+                try {
+                    CvNetVideo.Stop(currentStreamId);
+                    Android.onStreamStopped();
+                } catch (error) {
+                    Android.onError('Stop stream failed: ' + error.message);
+                }
+            },
+            
+            changeLayout: function(num) {
+                if (!this.isReady) return;
+                try {
+                    CvNetVideo.LayoutByScreens(num);
+                    Android.onLayoutChanged();
+                } catch (error) {
+                    Android.onError('Layout change failed: ' + error.message);
+                }
+            },
+            
+            toggleFullscreen: function() {
+                if (!this.isReady) return;
+                try {
+                    CvNetVideo.FullScreen();
+                } catch (error) {
+                    Android.onError('Fullscreen toggle failed: ' + error.message);
+                }
+            }
+        };
+
+        // Notify Android when page is fully loaded
+        window.addEventListener('load', function() {
+            if (Android && Android.onPageLoaded) {
+                Android.onPageLoaded();
+            }
+        });
+
+        window.addEventListener('resize', function() {
+            if (videoPlayer && isInitialized) {
+                const container = document.querySelector('.video-container');
+                const width = container.clientWidth;
+                const height = width * 9/16;
+                CvNetVideo.Resize(width, height);
+            }
+        });
+    </script>
+</body>
+</html>
