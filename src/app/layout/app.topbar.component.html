@@ -1,10 +1,12 @@
 <div class="layout-topbar">
-  <a class="app-logo ml-3" routerLink="/tracking">
+  <a class="app-logo ml-7" routerLink="/tracking">
     <img
       alt="app logo"
-      [ngStyle]="{ width:  '4rem' }"
+      [ngStyle]="{ width:  '12rem' }"
       [src]="config.logo"
     />
+
+    
 
     <span class="app-name">{{ config.title }}</span>
   </a>
@@ -12,6 +14,8 @@
     "You are logged in as a child user. Once you refresh, you will go back to
     the admin"
   </p>
+  
+  
   <button
     #menubutton
     class="topbar-menubutton p-link"
@@ -101,7 +105,7 @@
       <i class="pi pi-angle-down"></i>
     </button>
     <ul
-      class="list-none p-3 m-0 border-round shadow-2 hidden absolute surface-overlay origin-top sm:w-12rem mt-2 right-0 top-auto"
+      class="list-none p-3 m-0 border-round shadow-2 hidden absolute surface-overlay origin-top sm:w-20rem mt-2 right-0 top-auto"
     >
       <li>
         <a
@@ -116,7 +120,7 @@
           *ngIf="authService.isLoginInAsChild"
           (click)="childlogout()"
           pRipple
-          class="flex p-2 border-round align-items-center hover:surface-hover transition-colors transition-duration-150 cursor-pointer"
+          class="flex p-2 border-round align-items-center transition-colors transition-duration-150 cursor-pointer"
         >
           <i class="pi pi-power-off mr-3"></i>
           <span>Child Sign Out</span>
@@ -124,7 +128,8 @@
         <a
           (click)="logout()"
           pRipple
-          class="flex p-2 border-round align-items-center hover:surface-hover transition-colors transition-duration-150 cursor-pointer"
+          style="color: red;"
+          class="flex p-2 border-round align-items-center hover:bg-red-300 hover:text-white transition-colors transition-duration-150 cursor-pointer"
         >
           <i class="pi pi-power-off mr-3"></i>
           <span>Sign Out</span>

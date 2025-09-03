@@ -2,12 +2,12 @@
     <ol>
         <li>
             <a [routerLink]="['/']">
-                <i  class="pi pi-home text-black-900" style="font-size: 2rem;color:black"></i>
+                <i  class="lni lni-home-2 bg-[var(--v-menuitem-text-color)]" style="font-size: 2rem;color:var(--v-menuitem-text-color)"></i>
             </a>
         </li>
         <li class="layout-breadcrumb-chevron"> / </li>
         <ng-template ngFor let-item let-last="last" [ngForOf]="breadcrumbs$ | async">
-            <li class="font-bold" style="color:black">{{item.label}}</li>
+            <li class="font-medium" style="color:var(--v-menuitem-text-color)">{{item.label}}</li>
             <li *ngIf="!last" class="layout-breadcrumb-chevron"> / </li>
         </ng-template>
     </ol>

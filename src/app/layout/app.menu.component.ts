@@ -20,23 +20,22 @@ export class AppMenuComponent implements OnInit {
 
     loadAppMenu(){
         this.model = []
-        this.model.push({label: 'Dashboard', icon: 'pi pi-home', routerLink: ['/']})
-        this.model.push({label: 'Tracking', icon: 'pi pi-car', routerLink: ['/tracking']})
-        this.model.push({label: 'Devices', icon: 'pi pi-server', routerLink: ['/device',"null"]})
-        this.model.push({label: 'Users', icon: 'pi pi-user', routerLink: ['/user']})
+        this.model.push({label: 'Dashboard', icon: 'lni lni-home-2', routerLink: ['/']})
+        this.model.push({label: 'Tracking', icon: 'lni lni-route-1', routerLink: ['/tracking']})
+        this.model.push({label: 'Devices', icon: 'lni lni-cloud-iot-2', routerLink: ['/device',"null"]})
+        this.model.push({label: 'Users', icon: 'lni lni-user-multiple-4', routerLink: ['/user']})
         if (this.authService.userType === "Admin") {
-            this.model.push({label: 'Raw Data', icon: 'pi pi-book', routerLink: ['/raw']})
+            this.model.push({label: 'Raw Data', icon: 'lni lni-database-2', routerLink: ['/raw']})
             if (config.subscriptionPlan) {
                 this.model.push({label: 'Plan Billing', icon: 'pi pi-money-bill', routerLink: ['/planBillings']})
             }
         }
 
-        this.model.push({label: 'Reports', icon: 'pi pi-chart-bar', routerLink: ['/reports']})
-        this.model.push({label: 'Notifications', icon: 'pi pi-inbox', routerLink: ['/notifications'],})
+        this.model.push({label: 'Reports', icon: 'lni lni-folder-1', routerLink: ['/reports']})
+        this.model.push({label: 'Notifications', icon: 'lni lni-bell-1', routerLink: ['/notifications'],})
         // this.model.push({label: 's', icon: 'pi pi-inbox', routerLink: ['/settings'],})
-
         // this.model.push({label: 'Inventory', icon: 'pi pi-users', routerLink: ['/inventory'],})
-        this.model.push({label: 'Geofence', icon: 'pi pi-map-marker', routerLink: ['/geofence'],})
+        this.model.push({label: 'Geofence', icon: 'lni lni-map-marker-1', routerLink: ['/geofence'],})
         // this.model.push({label: 'Tracking1', icon: 'pi pi-car', routerLink: ['/tracking1']})
 
         if(config.layout==1){
