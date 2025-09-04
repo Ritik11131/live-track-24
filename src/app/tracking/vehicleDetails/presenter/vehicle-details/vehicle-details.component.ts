@@ -342,7 +342,7 @@ checkScroll() {
 
   ngOnInit(): void {
 
-debugger;
+// debugger;
     this.subscription1 = this.vehicleListRepo.closeForm$.subscribe((isOpen) => {
       this.dateComponent = isOpen;
     });

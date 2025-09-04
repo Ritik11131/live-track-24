@@ -16,7 +16,6 @@
   position: relative;
   overflow: hidden;
   max-width: 100%;
-  background: #fff;
   border-radius: 13px;
   display: flex;
   align-items: center;
@@ -72,19 +71,17 @@
   white-space: nowrap;
   background: #CFCFCF;
   padding: 1px 6px;
-  border-radius: 30px;
+  border-radius: 5px;
   border: 1px solid #d8d5f2;
 }
-.tabs-box .tab:hover {
-  background: #efedfb;
-}
+
 .tabs-box.dragging .tab {
   user-select: none;
   pointer-events: none;
 }
 .tabs-box .tab:hover {
   color: #fff;
-  background: #1797B0;
+  background: var(--primary-color);
   border-color: transparent;
 }
 

@@ -240,7 +240,7 @@ export class VehicleListComponent
   }
 
   ngOnInit(): void {
-    debugger;
+    // debugger;
     console.log(this.selectedTabs);
 
     this.configService.setConfigSubject$.subscribe((data) => {
@@ -339,7 +339,7 @@ export class VehicleListComponent
       );
   }
   ngAfterViewInit(): void {
-    debugger
+    // debugger
     this.initMap();
     this.getVehicleList();
     // for calling it every 30 sec oif
@@ -471,8 +471,7 @@ export class VehicleListComponent
   }
 
   switchView(): void {
-    this.showTemplate =
-      this.showTemplate == "device-details" ? "device-list" : "device-details";
+    this.showTemplate = this.showTemplate == "device-details" ? "device-list" : "device-details";
     this.isLarge = !this.isLarge;
     this.invalidateMap();
 this.removeMarker(this.currentLocationMarker)
@@ -552,7 +551,6 @@ this.removeMarker(this.currentLocationMarker)
       this.activeCategoryIndex=0
       this.details_title = this.lastClicked.device?.vehicleNo!;
       this.pushDataService.pushData(value, this);
-      this.getGeofenceByDeviceId()
       this.switchView();
     }
   }
