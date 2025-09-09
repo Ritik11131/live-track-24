@@ -25,7 +25,7 @@ export class UserListComponent implements OnInit {
   selectedUsers: User[] = [];
   deviceData: boolean = false;
   userData: boolean = false;
-  buttonText: string = "Add New User";
+  buttonText: string = "Add User";
   devices: { [deviceId: string]: Device[] } = {};
   // devices:Device[]=[]
   subscriptionMessage!: Subscription;

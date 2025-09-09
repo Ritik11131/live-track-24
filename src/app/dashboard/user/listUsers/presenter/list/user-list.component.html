@@ -1,4 +1,4 @@
-<div class="card">
+<div class="">
   <h3 class="m-0 font-semibold">User List</h3>
   <p-table
     #dt
@@ -37,8 +37,9 @@
         <button
           (click)="navigateToCreateUser()"
           pButton
-          class="p-button-outlined w-full text-xl sm:w-auto flex-order-0 sm:flex-order-1"
-          icon="pi pi-user-plus"
+          class="bg-white"
+          style="color: var(--primary-color)"
+          icon="pi pi-plus"
           label="{{ buttonText }}"
         ></button>
       </div>
@@ -102,8 +103,7 @@
               pTooltip="Edit user"
               tooltipPosition="bottom"
               type="button"
-              class="p-button-rounded p-button-text"
-              style="font-size: 1.5rem"
+             class="mr-2"
               (click)="navigateToUpdateUser(rowUser)"
             >
               <i class="pi pi-user-edit" style="font-size: 1.5rem"></i>
@@ -114,7 +114,8 @@
               pTooltip="Show/Change Password"
               tooltipPosition="bottom"
               type="button"
-              class="p-button-rounded p-button-text"
+             class="mr-2"
+              
               (click)="showPassword(rowUser)"
             >
               <i class="pi pi-eye" style="font-size: 1.5rem"></i>
@@ -138,7 +139,7 @@
               tooltipPosition="bottom"
               type="button"
               [pRowToggler]="rowUser"
-              class="p-button-rounded p-button-text"
+             class="mr-2"
               (click)="toggleRow(rowUser.id); $event.stopPropagation()"
             >
               <i class="pi pi-car" style="font-size: 1.5rem"></i>
@@ -152,7 +153,6 @@
             type="button"
             pTooltip="Login User"
             tooltipPosition="bottom"
-            class="p-button-rounded p-button-text"
             (click)="login(rowUser)"
           >
             <i class="pi pi-sign-in" style="font-size: 1.5rem"></i>

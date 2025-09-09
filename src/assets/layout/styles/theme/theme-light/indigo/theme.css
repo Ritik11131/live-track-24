@@ -2896,15 +2896,17 @@
     border-radius: 0;
   }
   .p-datatable .p-datatable-header {
-    background: #f8f9fa;
+    margin-top: 18px;
+    background: var(--primary-color);
     color: #343a40;
-    border: 1px solid #dee2e6;
+    border-radius: 5px;
     border-width: 1px 0 1px 0;
     padding: 1rem 1rem;
     font-weight: 700;
+
   }
   .p-datatable .p-datatable-footer {
-    background: #f8f9fa;
+    background: var(--primary-color);
     color: #343a40;
     border: 1px solid #dee2e6;
     border-width: 0 0 1px 0;
@@ -2912,9 +2914,8 @@
     font-weight: 700;
   }
   .p-datatable .p-datatable-thead > tr > th {
-    text-align: left;
+    text-align: center;
     padding: 1rem 1rem;
-    border: 1px solid #dee2e6;
     border-width: 0 0 1px 0;
     font-weight: 700;
     color: #343a40;
@@ -2922,7 +2923,7 @@
     transition: box-shadow 0.2s;
   }
   .p-datatable .p-datatable-tfoot > tr > td {
-    text-align: left;
+    text-align: center;
     padding: 1rem 1rem;
     border: 1px solid #dee2e6;
     border-width: 0 0 1px 0;
@@ -2974,10 +2975,10 @@
     transition: box-shadow 0.2s;
   }
   .p-datatable .p-datatable-tbody > tr > td {
-    text-align: left;
+    text-align: center;
     border: 1px solid #dee2e6;
     border-width: 0 0 1px 0;
-    padding: 1rem 1rem;
+    padding: 1.5rem 1.5rem;
   }
   .p-datatable .p-datatable-tbody > tr > td .p-row-toggler,
 .p-datatable .p-datatable-tbody > tr > td .p-row-editor-init,
@@ -3427,11 +3428,11 @@
   }
 
   .p-paginator {
-    background: #ffffff;
-    color: #6c757d;
+    background: var(--primary-color);
+    color:var(--primary-color-text);
     border: solid #e9ecef;
     border-width: 0;
-    padding: 0.5rem 1rem;
+    padding: 1rem 1rem;
     border-radius: 6px;
   }
   .p-paginator .p-paginator-first,
@@ -3439,8 +3440,8 @@
 .p-paginator .p-paginator-next,
 .p-paginator .p-paginator-last {
     background-color: transparent;
+    color: var(--primary-color-text);
     border: 0 none;
-    color: #6c757d;
     min-width: 3rem;
     height: 3rem;
     margin: 0.143rem;
@@ -3453,7 +3454,6 @@
 .p-paginator .p-paginator-last:not(.p-disabled):not(.p-highlight):hover {
     background: #e9ecef;
     border-color: transparent;
-    color: #343a40;
   }
   .p-paginator .p-paginator-first {
     border-top-left-radius: 50%;
@@ -3481,7 +3481,6 @@
   .p-paginator .p-paginator-current {
     background-color: transparent;
     border: 0 none;
-    color: #6c757d;
     min-width: 3rem;
     height: 3rem;
     margin: 0.143rem;
@@ -3495,7 +3494,7 @@
     height: 3rem;
     margin: 0.143rem;
     transition: box-shadow 0.2s;
-    border-radius: 50%;
+    border-radius: 20%;
   }
   .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
     background: #edeff8;
