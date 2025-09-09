@@ -16,151 +16,123 @@
 >
   <p-progressSpinner></p-progressSpinner>
 </div>
+
 <div class="grid">
-  <div
-    [ngClass]="
-      fullDisplay ? 'hidden  ' : ' col-12 sm:col-12 md:col-5 lg:col-4 xl:col-3'
-    "
-  >
-    <div class="card" style="height: 75vh">
-      <div
-        class="flex flex-column flex-wrap gap-2 align-items-center justify-content-between"
-      >
-        <p-dropdown
-          class="w-full"
-          [style]="{ width: '100%' }"
-          [options]="reports"
-          optionLabel="name"
-          placeholder="Select a Report Type"
-          (onChange)="onDropdownChange($event)"
-        ></p-dropdown>
+  <!-- Row 1: Filters and Actions -->
+  <div class="col-12">
+    <div class="p-4 bg-white border-round flex flex-wrap gap-3 align-items-center justify-content-start">
+      <p-dropdown
+        styleClass="w-20rem"
+        [options]="reports"
+        optionLabel="name"
+        placeholder="Select a Report Type"
+        (onChange)="onDropdownChange($event)"
+      ></p-dropdown>
 
-        <p-dropdown
-          *ngIf="selectedReport !== 'TDS'"
-          autoWidth="false"
-          class="w-full"
-          [style]="{ width: '100%' }"
-          [options]="devices"
-          [filter]="true"
-          [filterBy]="selectedReportName"
-          [resetFilterOnHide]="true"
-          optionLabel="name"
-          (onChange)="onDropdownChange1($event)"
-          placeholder="Select Vehicle"
-        ></p-dropdown>
+      <p-dropdown
+        *ngIf="selectedReport !== 'TDS'"
+        styleClass="w-20rem"
+        [options]="devices"
+        [filter]="true"
+        [filterBy]="selectedReportName"
+        [resetFilterOnHide]="true"
+        optionLabel="name"
+        (onChange)="onDropdownChange1($event)"
+        placeholder="Select Vehicle"
+      ></p-dropdown>
 
-        <p-multiSelect
-          *ngIf="selectedReport === 'TDS'"
-          [options]="devices"
-          placeholder="Select User"
-          optionLabel="name"
-          optionValue="code"
-          display="chip"
-          class="w-full"
-          [(ngModel)]="selectedVehicle"
-          [showClear]="true"
-        ></p-multiSelect>
-        <input
-          class="w-full text-xl"
-          pInputText
-          type="text"
-          (input)="onInput($event)"
-          *ngIf="selectedReport === 'OS'"
-          placeholder="Select OverSpeed Limit"
-          [(ngModel)]="overSpeedLimit"
-        />
-        <input
-          class="w-full text-xl"
-          pInputText
-          type="text"
-          (input)="onInput($event)"
-          *ngIf="selectedReport === 'DETAIL'"
-          placeholder="Select Timespan"
-          [(ngModel)]="timeSpan"
-        />
-        <input
-          class="w-full text-xl"
-          pInputText
-          (click)="openDateComponent()"
-          placeholder="Select Date"
-          [(ngModel)]="dateRange"
-        />
+      <p-multiSelect
+        *ngIf="selectedReport === 'TDS'"
+        [options]="devices"
+        placeholder="Select User"
+        optionLabel="name"
+        optionValue="code"
+        display="chip"
+        class="w-15rem"
+        [(ngModel)]="selectedVehicle"
+        [showClear]="true"
+      ></p-multiSelect>
 
-        <button
-          pButton
-          class="w-full text-xl"
-          label="Generate"
-          style="background-color: #1797b0"
-          (click)="getReport(selectedReportName)"
-        ></button>
-        <div class="flex flex-row gap-2 w-full">
-          <button
-            pButton
-            class="w-full text-xl"
-            label="Pdf"
-            icon="pi pi-cloud-download"
-            [style]="{
-              'background-color': 'white',
-              'border-color': '#4C63B6',
-              color: '#4C63B6'
-            }"
-            (click)="exportToPdf(selectedReportName)"
-            [disabled]="isDataAvailable()"
-          ></button>
+      <input
+        *ngIf="selectedReport === 'OS'"
+        class="w-12rem"
+        pInputText
+        type="text"
+        (input)="onInput($event)"
+        placeholder="OverSpeed Limit"
+        [(ngModel)]="overSpeedLimit"
+      />
 
-          <button
-            pButton
-            class="w-full text-xl"
-            label="Excel"
-            icon="pi pi-cloud-download"
-            [style]="{
-              'background-color': 'white',
-              'border-color': '#4C63B6',
-              color: '#4C63B6'
-            }"
-            (click)="exportToExcel(selectedReportName)"
-            [disabled]="isDataAvailable()"
-          ></button>
-        </div>
-      </div>
+      <input
+        *ngIf="selectedReport === 'DETAIL'"
+        class="w-12rem h-full text-base"
+        pInputText
+        type="text"
+        (input)="onInput($event)"
+        placeholder="Timespan"
+        [(ngModel)]="timeSpan"
+      />
+
+      <input
+      style="height: 34px;"
+        class="w-20rem text-base"
+        pInputText
+        (click)="openDateComponent()"
+        placeholder="Select Date"
+        [(ngModel)]="dateRange"
+      />
+
+      <button
+        pButton
+        class="p-button-primary"
+        label="Generate"
+        (click)="getReport(selectedReportName)"
+      ></button>
+
+      <button
+        pButton
+        label="Pdf"
+        icon="pi pi-file-pdf"
+        class="p-button-outlined"
+        (click)="exportToPdf(selectedReportName)"
+        [disabled]="isDataAvailable()"
+      ></button>
+
+      <button
+        pButton
+        label="Excel"
+        icon="pi pi-file-excel"
+        class="p-button-outlined"
+        (click)="exportToExcel(selectedReportName)"
+        [disabled]="isDataAvailable()"
+      ></button>
     </div>
   </div>
-  <div
-    [ngClass]="
-      fullDisplay ? 'col-12 ' : ' col-12 sm:col-12 md:col-7 lg:col-8 xl:col-9'
-    "
-  >
+
+  <!-- Row 2: Table -->
+  <div class="col-12">
     <div class="card" style="height: 75vh">
       <p-table
         #dt
         id="reportTable"
         [paginator]="true"
         [rows]="10"
-        [value]="distanceReport"
-        [value]="stopReport"
-        [value]="idleReport"
-        [value]="tripReport"
-        [value]="overspeedReport"
-        [value]="socReport"
-        [value]="temperatureReport"
-        [value]="detailReport"
-        [value]="totalDistanceReport"
+        [value]="distanceReport || stopReport || idleReport || tripReport || overspeedReport || socReport || temperatureReport || detailReport || totalDistanceReport"
         [scrollable]="true"
-        styleClass="p-datatable-gridlines" 
-
-        scrollHeight="55vh"
+        styleClass="p-datatable-gridlines"
+        scrollHeight="60vh"
         (onPage)="onPageChange($event)"
         [showCurrentPageReport]="true"
         responsiveLayout="scroll"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         [globalFilterFields]="['timestamp']"
       >
-        <ng-template pTemplate="caption">
+         <ng-template pTemplate="caption">
           <div class="flex align-items-center gap-2">
             <!-- <button (click)="toggleArrow()" pButton class=" justify-content-center border-circle align-items-center" style="padding:5px">
           <i  [ngClass]="fullDisplay ? 'pi pi-arrow-right' : 'pi pi-arrow-left'" ></i>
          </button> -->
-            <h3 class="m-0 font-semibold">
+            <h3 class="m-0 font-semibold" style="color: var(--primary-color-text);">
               {{ selectedReportName }}
               <span *ngIf="selectedReport === 'DR' && totalDistance !== 0"
                 >({{ totalDistance.toFixed(2) }}km)</span
@@ -584,7 +556,7 @@
         </ng-template>
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td colspan="6"></td>
+            <td colspan="6"><i class="pi pi-info-circle mr-2"></i>No Data Found</td>
           </tr>
         </ng-template>
       </p-table>

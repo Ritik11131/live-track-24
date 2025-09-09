@@ -1,140 +1,147 @@
 <div
-  class=" flex flex-column align-items-center justify-content-center h-screen w-screen absolute top-0 left-0"  
-  style="z-index: 3000;background-color: rgba(0, 0, 0, 0.6)"
+  class="flex align-items-center justify-content-center h-screen w-screen absolute top-0 left-0"
+  style="z-index: 3000; background-color: rgba(0, 0, 0, 0.6)"
 >
-<div class="flex flex-column bg-gray-100 xl:w-3 md:w-4 sm:w-6 w-9 p-4 border-round-3xl">
-  <div class="flex flex-row justify-content-between mb-2 ">
-    <p class="text-2xl">Select Date</p>
-    <i class="pi pi-times cursor-pointer" (click)="closeUserLinkForm()"></i>
-  </div>
-  <input
-  style="border: none; color: #999"
-  class="border-round-xl text-lg shadow-2 p-3 mb-2 border-black-900 font-bold"
-  placeholder="{{getPlaceholder()}}"
-  type="text"
-  [(ngModel)]="selectedDateRange"
-  (ngModelChange)="handleDateRangeChange()"
-  readonly
-/>
-
-  <div
-    class="p-2 flex p-4 z-5 border-round-xl surface-0 shadow-2 flex-column gap-2 justify-content-center"
-    *ngIf="range"
-  >
-    <input
-      style="border: none; color: #999"
-      class="border-round-xl cursor-pointer text-lg p-3 shadow-2 font-bold"
-      placeholder="Today"
-      type="text "
-      (click)="selectDateRange('today')"
-      readonly
-    />
-
-    <input
-      style="border: none; color: #999"
-      class="border-round-xl cursor-pointer  text-lg p-3 shadow-2 font-bold"
-      placeholder="Yesterday"
-      type="text "
-      (click)="selectDateRange('yesterday')"
-      readonly
-    />
-
-    <input *ngIf="!restrictDateComponents"
-      class="border-round-xl cursor-pointer  text-lg p-3 shadow-2 font-bold"
-      style="border: none; color: #999"
-      placeholder="Last 7 days"
-      type="text"
-      (click)="selectDateRange('last7days')"
-      readonly
-    />
-
-    <input  *ngIf="!restrictDateRange"
-      class="border-round-xl cursor-pointer  text-lg p-3 shadow-2 font-bold"
-      style="border: none; color: #999"
-      placeholder="This month"
-      type="text "
-      (click)="selectDateRange('thisMonth')"
-      readonly
-    />
-
-    <input
-      class="border-round-xl cursor-pointer  text-lg p-3 shadow-2 font-bold"
-      style="border: none; color: #999"
-      placeholder="Custom range"
-      type="text "
-      readonly
-      (click)="showCustomRange()"
-    />
-    <button
-      class="border-none p-3 text-lg font-semibold text-white border-round-xl"
-      label="Apply"
-      style="background-color: #22C55E;"
-      (click)="showResult('applyDate')"
-    >
-      Apply
-    </button>
-    <button
-      class="border-none p-3 text-lg  font-semibold  text-white border-round-xl"
-      label="Cancel"
-      style="background-color: #EF4444;"
-     (click)="closeUserLinkForm()"
-    >
-      Cancel
-    </button>
-  </div>
-  <div
-    class="p-4 shadow-2  z-5 left-auto surface-0 border-round-xl flex flex-column gap-2 justify-content-center w-full"
-    *ngIf="customRange"
-    style="top: 20rem"
-  >
-    <h5>Custom Range</h5>
-<div  *ngIf="!restrictDateComponents">
-    <p-calendar 
-      [style]="{ width: '100%' }"
-      placeholder="Start Date"
-      [(ngModel)]="date1"
-      [showTime]="true"
-      [showSeconds]="true"
-
-      [maxDate]="date2"      
-         ></p-calendar>
-    <p-calendar 
-      placeholder="End Date"
-      [style]="{ width: '100%' }"
-      [(ngModel)]="date2"
-      [showTime]="true"
-      [minDate]="date1"
-      [showSeconds]="true"
-      class=" cursor-pointer "
-
-      [maxDate]="maxDate"
-      ></p-calendar>
+  <div class="flex flex-column bg-white xl:w-3 md:w-4 sm:w-6 w-10 p-5 border-round-2xl shadow-4">
+    <!-- Header -->
+    <div class="flex justify-content-between align-items-center mb-4">
+      <h2 class="m-0 text-xl font-bold text-900">Select Date</h2>
+      <i
+        class="pi pi-times cursor-pointer text-xl text-600 hover:text-red-500 transition-colors"
+        (click)="closeUserLinkForm()"
+      ></i>
     </div>
-    <p-calendar  *ngIf="restrictDateComponents"
-    placeholder="Select Date"
-    [style]="{ width: '100%' }"
-    [(ngModel)]="date3"
-    class=" cursor-pointer "
 
-    [maxDate]="maxDate"
-    ></p-calendar>
-    <small *ngIf="dateError1 && restrictDateRange" class="text-red">Entered date has more than 7 day gap</small>
- 
-    <button
-      class="border-none p-3 text-lg  font-semibold text-white border-round-xl"
-      label="Apply"
-      style="background-color: #22C55E;"
-      (click)="showResult(restrictDateComponents ? 'applyCustomDate' : 'applyCustomRange')"    >
-      Apply
-    </button>
-    <button
-      class="border-none p-3 text-lg font-semibold  text-white border-round-xl"
-      label="Cancel"
-      style="background-color: #EF4444;"
-      (click)="closeUserLinkForm()"
+    <!-- Selected Range Display -->
+    <div
+      class="p-3 border-round-lg bg-gray-100 text-center text-md font-semibold text-700 mb-4 shadow-inner"
     >
-      Cancel
-    </button>
-  </div>
+      {{ selectedDateRange || getPlaceholder() }}
+    </div>
+
+    <!-- Quick Select Buttons in 2-column layout -->
+    <div *ngIf="range" class="grid mb-4">
+      <div class="col-6">
+        <button
+          pButton
+          class="w-full border-round-lg p-3 text-lg font-medium"
+          (click)="selectDateRange('today')"
+          label="Today"
+        ></button>
+      </div>
+      <div class="col-6">
+        <button
+          pButton
+          class="w-full border-round-lg p-3 text-lg font-medium"
+          (click)="selectDateRange('yesterday')"
+          label="Yesterday"
+        ></button>
+      </div>
+      <div class="col-6" *ngIf="!restrictDateComponents">
+        <button
+          pButton
+          class="w-full border-round-lg p-3 text-lg font-medium"
+          (click)="selectDateRange('last7days')"
+          label="Last 7 Days"
+        ></button>
+      </div>
+      <div class="col-6" *ngIf="!restrictDateRange">
+        <button
+          pButton
+          class="w-full border-round-lg p-3 text-lg font-medium"
+          (click)="selectDateRange('thisMonth')"
+          label="This Month"
+        ></button>
+      </div>
+      <!-- Custom Range full width -->
+      <div class="col-12">
+        <button
+          pButton
+          class="w-full border-round-lg p-3 text-lg font-medium bg-indigo-500 text-white hover:bg-indigo-600"
+          (click)="showCustomRange()"
+          label="Custom Range"
+        ></button>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-content-end gap-2 mb-4" *ngIf="range">
+      <button
+        pButton
+        class="px-5 py-2 text-lg font-semibold border-round-lg text-white"
+        (click)="showResult('applyDate')"
+      >
+        Apply
+      </button>
+      <button
+        pButton
+        class="px-5 py-2 text-lg font-semibold border-round-lg bg-red-500 hover:bg-red-600 text-white"
+        (click)="closeUserLinkForm()"
+      >
+        Cancel
+      </button>
+    </div>
+
+    <!-- Custom Range Picker -->
+    <div
+      *ngIf="customRange"
+      class="flex flex-column gap-3 border-top-1 surface-border pt-4"
+    >
+      <h3 class="m-0 text-lg font-semibold text-800">Custom Range</h3>
+
+      <div *ngIf="!restrictDateComponents" class="flex flex-column gap-3">
+        <p-calendar
+          placeholder="Start Date"
+          [style]="{ width: '100%' }"
+          [(ngModel)]="date1"
+          [showTime]="true"
+          [showSeconds]="true"
+          [maxDate]="date2"
+        ></p-calendar>
+
+        <p-calendar
+          placeholder="End Date"
+          [style]="{ width: '100%' }"
+          [(ngModel)]="date2"
+          [showTime]="true"
+          [showSeconds]="true"
+          [minDate]="date1"
+          [maxDate]="maxDate"
+        ></p-calendar>
+      </div>
+
+      <p-calendar
+        *ngIf="restrictDateComponents"
+        placeholder="Select Date"
+        [style]="{ width: '100%' }"
+        [(ngModel)]="date3"
+        [maxDate]="maxDate"
+      ></p-calendar>
+
+      <small
+        *ngIf="dateError1 && restrictDateRange"
+        class="text-red-500 font-medium"
+      >
+        Entered date has more than 7 day gap
+      </small>
+
+      <!-- Custom Range Buttons -->
+      <div class="flex justify-content-end gap-2 mt-3">
+        <button
+          pButton
+          class="px-5 py-2 text-lg font-semibold border-round-lg text-white"
+          (click)="showResult(restrictDateComponents ? 'applyCustomDate' : 'applyCustomRange')"
+        >
+          Apply
+        </button>
+        <button
+          pButton
+          class="px-5 py-2 text-lg font-semibold border-round-lg bg-red-500 hover:bg-red-600 text-white"
+          (click)="closeUserLinkForm()"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
   </div>
 </div>
