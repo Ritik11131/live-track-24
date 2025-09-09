@@ -1,102 +1,149 @@
-<div
-  class="flex flex-column align-items-center justify-content-center h-screen w-screen absolute top-0 left-0"
-  style="z-index: 3000; background-color: rgba(0, 0, 0, 0.6)"
-  (drop)="onDrop($event)"
-  (dragover)="onDragOver($event)"
->
-  <div
-    class="flex flex-column gap-4 bg-gray-100  w-9 p-4 border-round-3xl"
-  >
-    <div class="flex flex-row justify-content-between mb-2">
-      <p class="text-3xl font-bold">File Upload</p>
-      <i class="pi pi-times cursor-pointer" (click)="resetUpload()"></i>
-    </div>
-
-    <div class="flex flex-row gap-2 w-full">
-      <div class="flex flex-row justify-content-evenly gap-3 w-6">
-        <button             style="background-color: #1797b0"
-        pButton class="pi pi-cloud-upload w-6 h-10rem border-0" (click)="selectFile()">
-          <label for="files"> Select File</label>
-        </button>
-        <button
-          pButton             style="background-color: #1797b0"
-
-          (click)="downloadHeaderAsExcel()"
-          class="w-6 pi border-0 pi-cloud-download h-10rem"
-          label="Download Sheet Format"
-        ></button>
+<div class="flex flex-column align-items-center justify-content-center h-screen w-screen absolute top-0 left-0" 
+     style="z-index: 3000; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%); backdrop-filter: blur(10px);" 
+     (drop)="onDrop($event)" 
+     (dragover)="onDragOver($event)">
+  
+  <div class="flex flex-column gap-4 bg-white w-10 p-5 border-round-2xl shadow-8" 
+       style="max-width: 900px; border: 1px solid rgba(226, 232, 240, 0.8);">
+    
+    <!-- Header -->
+    <div class="flex flex-row justify-content-between align-items-center mb-3 pb-3" 
+         style="border-bottom: 1px solid #f1f5f9;">
+      <p class="text-4xl font-bold text-900 m-0" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        File Upload
+      </p>
+      <div class="flex align-items-center justify-content-center w-3rem h-3rem border-round-lg cursor-pointer surface-100 hover:surface-200 transition-colors transition-duration-200" 
+           (click)="resetUpload()" 
+           style="transition: all 0.2s ease;">
+        <i class="pi pi-times text-600 text-xl"></i>
       </div>
-      <div class="flex flex-column w-6">
-        <div
-          class="flex flex-row gap-2 h-10rem border-round-xl border-dashed border-blue-800 align-items-center justify-content-center"
-        >
-          <p *ngIf="!file" class="p-m-0 text-base">
-            'Drag and drop or browse your file'
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="flex flex-row gap-3 w-full mb-4">
+      <button pButton 
+              class="flex-1 p-3 border-0 border-round-xl font-semibold text-white shadow-3 hover:shadow-4 transition-all transition-duration-200" 
+              style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color) 100%); transform: translateY(0px);" 
+              onmouseover="this.style.transform='translateY(-2px)'" 
+              onmouseout="this.style.transform='translateY(0px)'" 
+              (click)="selectFile()">
+        <i class="pi pi-cloud-upload mr-2"></i>
+        Select File
+      </button>
+      
+      <button pButton 
+              class="flex-1 p-3 border-0 border-round-xl font-semibold text-white shadow-3 hover:shadow-4 transition-all transition-duration-200" 
+              style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); transform: translateY(0px);" 
+              onmouseover="this.style.transform='translateY(-2px)'" 
+              onmouseout="this.style.transform='translateY(0px)'" 
+              (click)="downloadHeaderAsExcel()">
+        <i class="pi pi-download mr-2"></i>
+        Download Sheet Format
+      </button>
+    </div>
+    
+    <!-- Drop Zone -->
+    <div class="flex flex-column w-full mb-2">
+      <div class="flex flex-column align-items-center justify-content-center gap-3 border-round-2xl p-6 cursor-pointer transition-all transition-duration-300 hover:shadow-3" 
+           style="border: 2px dashed #cbd5e1; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); min-height: 200px;" 
+           onmouseover="this.style.borderColor='#3b82f6'; this.style.background='linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)'; this.style.transform='scale(1.02)'" 
+           onmouseout="this.style.borderColor='#cbd5e1'; this.style.background='linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)'; this.style.transform='scale(1)'">
+        
+        <div *ngIf="!file" class="flex flex-column align-items-center gap-3">
+          <div class="flex align-items-center justify-content-center w-4rem h-4rem border-round-3xl text-white shadow-3" 
+               style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color) 100%);">
+            <i class="pi pi-cloud-upload text-2xl"></i>
+          </div>
+          <p class="text-lg text-600 m-0 font-medium text-center">
+            Drag and drop or browse your file
           </p>
-          <input
-            id="files"
-            class="hidden"
-            *ngIf="!file"
-            pInputText
-            type="file"
-            accept=".xlsx,xlsm,.csv,.xls "
-            (change)="onFileChange($event)"
-          />
-          <p *ngIf="file" class="p-m-0">{{ file.name }}</p>
         </div>
-        <div class="flex justify-content-start">
-          <small>Only .xlsx,xlsm,.csv,.xls files are accepted </small>
+        
+        <div *ngIf="file" class="flex align-items-center gap-3 p-3 border-round-xl w-full" 
+             style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 1px solid #0ea5e9;">
+          <div class="flex align-items-center justify-content-center w-3rem h-3rem border-round-lg text-white" 
+               style="background: var(--primary-color);">
+            <i class="pi pi-file text-lg"></i>
+          </div>
+          <div class="flex flex-column">
+            <p class="text-900 font-semibold m-0">{{ file.name }}</p>
+            <p class="text-600 text-sm m-0">{{ (file.size / 1024 / 1024).toFixed(2) }} MB</p>
+          </div>
         </div>
+        
+        <input id="files" 
+               class="hidden" 
+               *ngIf="!file" 
+               pInputText 
+               type="file" 
+               accept=".xlsx,.xlsm,.csv,.xls" 
+               (change)="onFileChange($event)" />
+      </div>
+      
+      <div class="flex justify-content-start mt-2">
+        <small class="text-600">Only .xlsx, .xlsm, .csv, .xls files are accepted</small>
       </div>
     </div>
-
-    <div class="modal-content bg-white p-4 border-round-xl">
-      <div>
-        <p-table
-          #dataTable
-          [value]="fileContent.rows"
-          [scrollable]="true"
-          [scrollHeight]="'300px'"
-          [tableStyle]="{ 'min-width': '100rem' }"
-        >
+    
+    <!-- Data Preview -->
+    <div class="bg-white border-round-2xl overflow-hidden shadow-2" 
+         style="border: 1px solid #e2e8f0;">
+      
+      <div class="bg-gray-50 p-4" 
+           style="border-bottom: 1px solid #e2e8f0;">
+        <h3 class="text-xl font-bold text-900 m-0">Data Preview</h3>
+      </div>
+      
+      <div class="p-4">
+        <p-table #dataTable 
+                 [value]="fileContent.rows" 
+                 [scrollable]="true" 
+                 [scrollHeight]="'300px'"
+                 [tableStyle]="{ 'min-width': '100rem' }" 
+                 styleClass="p-datatable-sm">
           <ng-template pTemplate="header" let-columns>
-            <tr class="text-lg font-bold">
-              <th class="white-space-nowrap" *ngFor="let col of fileHeaders">{{ col }}</th>
+            <tr class="bg-gray-50">
+              <th class="white-space-nowrap font-bold text-900 p-3" 
+                  style="position: sticky; top: 0; background: #f8fafc; border-bottom: 2px solid #e2e8f0;" 
+                  *ngFor="let col of fileHeaders">
+                {{ col }}
+              </th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-rowData let-columns="columns">
-            <tr>
-              <td *ngFor="let cell of rowData">{{ cell }}</td>
+            <tr class="hover:bg-gray-50 transition-colors transition-duration-150">
+              <td class="p-3 text-700" *ngFor="let cell of rowData">{{ cell }}</td>
             </tr>
           </ng-template>
         </p-table>
+        
+        <div class="text-center p-6" 
+             *ngIf="!fileContent || !fileContent.headers || fileContent.headers.length === 0">
+          <div class="flex flex-column align-items-center gap-3">
+            <div class="flex align-items-center justify-content-center w-4rem h-4rem border-round-3xl bg-gray-100">
+              <i class="pi pi-inbox text-2xl text-600"></i>
+            </div>
+            <p class="text-600 m-0 font-medium">No data to display. Upload a file to see preview.</p>
+          </div>
+        </div>
       </div>
-      <div class="mt-2"
-        *ngIf="
-          !fileContent ||
-          !fileContent.headers ||
-          fileContent.headers.length === 0
-        "
-      >
-        No data to display.
-      </div>
-
-      <div
-        *ngIf="
-          !fileContent ||
-          !fileContent.headers ||
-          fileContent.headers.length === 0
-        "
-      ></div>
     </div>
-    <div class="flex justify-content-center gap-2">
-      <button
-        pButton
-        class="border-round-3xl"
-        label="Upload"
-        (click)="uploadFile()"
-        [disabled]="!file || uploading"
-      ></button>
+    
+    <!-- Upload Button -->
+    <div class="flex justify-content-center pt-3" 
+         style="border-top: 1px solid #f1f5f9;">
+      <button pButton 
+              class="px-6 py-3 border-round-2xl font-bold text-white shadow-3 hover:shadow-4 transition-all transition-duration-200" 
+              style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-color) 100%); min-width: 140px; transform: translateY(0px);" 
+              onmouseover="this.style.transform='translateY(-2px)'" 
+              onmouseout="this.style.transform='translateY(0px)'" 
+              (click)="uploadFile()"
+              [disabled]="!file || uploading">
+        <i class="pi pi-upload mr-2" *ngIf="!uploading"></i>
+        <i class="pi pi-spin pi-spinner mr-2" *ngIf="uploading"></i>
+        {{ uploading ? 'Uploading...' : 'Upload' }}
+      </button>
     </div>
+    
   </div>
 </div>
