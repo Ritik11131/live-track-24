@@ -75,9 +75,10 @@
                         color: var(--v-menuitem-text-color);
 
                         &:hover {
-                            border: 2px solid var(--v-menuitem-hover-bg);
+                            border: 2px solid var(--primary-color);
                             padding: 10px;
-                            background: var(--v-menuitem-hover-bg);
+                            color: white;
+                            background: var(--primary-color);
                         }
 
                         .layout-submenu-toggler {

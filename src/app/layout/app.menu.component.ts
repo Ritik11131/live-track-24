@@ -20,7 +20,7 @@ export class AppMenuComponent implements OnInit {
 
     loadAppMenu(){
         this.model = []
-        this.model.push({label: 'Dashboard', icon: 'lni lni-home-2', routerLink: ['/']})
+        this.model.push({label: 'Dashboard', icon: 'lni lni-dashboard-square-1', routerLink: ['/']})
         this.model.push({label: 'Tracking', icon: 'lni lni-route-1', routerLink: ['/tracking']})
         this.model.push({label: 'Devices', icon: 'lni lni-cloud-iot-2', routerLink: ['/device',"null"]})
         this.model.push({label: 'Users', icon: 'lni lni-user-multiple-4', routerLink: ['/user']})
